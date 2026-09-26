@@ -9,7 +9,7 @@
 // ============================================================================
 
 // --- WhatsApp -----------------------------------------------------------
-export const WHATSAPP_PHONE = "18098760493";
+export const WHATSAPP_PHONE = "18492604759";
 
 const WHATSAPP_MESSAGES = {
   cotizar: "Hola, quiero cotizar la proteccion de una superficie.",
