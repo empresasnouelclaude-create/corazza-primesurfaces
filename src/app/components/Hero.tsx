@@ -60,13 +60,16 @@ export default function Hero() {
           </Reveal>
         </div>
 
-        <Reveal delay={0.15} className="hidden lg:block">
+        {/* Foto de la portada del PDF comercial (una superficie de marmol en
+            un ambiente real). En escritorio va al lado del titulo; en movil,
+            debajo de los botones, con el mismo contenedor 4:5. */}
+        <Reveal delay={0.15} className="mx-auto w-full max-w-md lg:max-w-none">
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl">
             <Image
-              src="/hero-producto.jpg"
-              alt="Kit de cuidado Corazza Prime Surfaces: ambientador y paños de microfibra"
+              src="/portafolio/cocina-isla-marmol.jpg"
+              alt="Cocina luminosa con isla de mármol claro veteado, taburetes tapizados de madera y ventanales con vista al mar."
               fill
-              sizes="480px"
+              sizes="(min-width: 1024px) 480px, (min-width: 448px) 448px, 100vw"
               className="object-cover object-center"
               priority
             />
