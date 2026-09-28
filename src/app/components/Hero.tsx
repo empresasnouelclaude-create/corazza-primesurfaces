@@ -49,17 +49,13 @@ export default function Hero() {
                 <WhatsAppIcon className="h-4 w-4" />
                 Cotiza tu superficie
               </a>
-              {/* "Como funciona" esta archivada hasta tener contenido
-                  redactado (ver page.tsx) -- se deja el boton en su lugar,
-                  con el mismo aspecto, pero como <span> (no <a>): no hay
-                  seccion a la que llevar todavia. */}
-              <span
-                className="inline-flex items-center justify-center gap-2.5 rounded-full border border-corazza-white/25 px-7 py-3.5 font-corazza-sans text-sm font-semibold text-corazza-white transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-corazza-white/10 active:scale-[0.97] cursor-default"
-                aria-disabled="true"
+              <a
+                href="#como-funciona"
+                className="inline-flex items-center justify-center gap-2.5 rounded-full border border-corazza-white/25 px-7 py-3.5 font-corazza-sans text-sm font-semibold text-corazza-white transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-corazza-white/10 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corazza-white"
               >
                 <CompassIcon className="h-4 w-4" />
                 Conoce cómo funciona
-              </span>
+              </a>
             </div>
           </Reveal>
         </div>

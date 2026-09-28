@@ -22,15 +22,17 @@ export default function Reveal({
 }) {
   const reduceMotion = useReducedMotion();
 
-  const transition: Transition = {
-    duration,
-    delay,
-    ease: [0.16, 1, 0.3, 1],
-  };
-
-  if (reduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
+  // Con movimiento reducido se renderiza el MISMO arbol (motion.div) pero
+  // con duracion 0: aparece directo, sin desplazamiento ni fundido. Cambiar
+  // de elemento segun la preferencia (div vs motion.div) hacia que el HTML
+  // del servidor no coincidiera con el del cliente (error de hidratacion).
+  const transition: Transition = reduceMotion
+    ? { duration: 0 }
+    : {
+        duration,
+        delay,
+        ease: [0.16, 1, 0.3, 1],
+      };
 
   return (
     <motion.div
