@@ -139,6 +139,9 @@ export const EXPERIENCIA = {
 } as const;
 
 // --- Pagina 9: dos acabados ----------------------------------------------------
+// Ajustado a pedido del cliente (no es el texto del PDF): se quitaron
+// MATERIAL, ADHESIVO, ESPESOR y ROLLO; ACABADO dice "Brillo super
+// transparente" en ambas fichas; "VIDA ÚTIL ESTIMADA" pasa a "VIDA ÚTIL".
 export type Finish = {
   id: "high-gloss" | "ultra-matte";
   brand: string;
@@ -157,14 +160,10 @@ export const TECNOLOGIA = {
       name: "HIGH GLOSS",
       subtitle: "PREMIUM SURFACE PROTECTION FILM",
       specs: [
-        { label: "ACABADO", value: "Transparente" },
-        { label: "MATERIAL", value: "TPU alifático" },
-        { label: "ADHESIVO", value: "USA Ashland" },
+        { label: "ACABADO", value: "Brillo super transparente" },
         { label: "TOP COATING", value: "Hidrofóbico + autorreparación con calor" },
-        { label: "ESPESOR", value: "190 micras / 7.5 mil" },
-        { label: "ROLLO", value: "152 cm × 15 m" },
         { label: "GARANTÍA", value: "5 años" },
-        { label: "VIDA ÚTIL ESTIMADA", value: "10 años*" },
+        { label: "VIDA ÚTIL", value: "10 años*" },
       ],
     },
     {
@@ -173,14 +172,10 @@ export const TECNOLOGIA = {
       name: "ULTRA MATTE",
       subtitle: "PREMIUM SURFACE PROTECTION FILM",
       specs: [
-        { label: "ACABADO", value: "Transparente mate" },
-        { label: "MATERIAL", value: "TPU alifático japonés" },
-        { label: "ADHESIVO", value: "USA Ashland" },
+        { label: "ACABADO", value: "Brillo super transparente" },
         { label: "TOP COATING", value: "Hidrofóbico + autorreparación con calor" },
-        { label: "ESPESOR", value: "190 micras / 7.5 mil" },
-        { label: "ROLLO", value: "152 cm × 15 m" },
         { label: "GARANTÍA", value: "7 años" },
-        { label: "VIDA ÚTIL ESTIMADA", value: "10 años*" },
+        { label: "VIDA ÚTIL", value: "10 años*" },
       ],
     },
   ] satisfies Finish[],
