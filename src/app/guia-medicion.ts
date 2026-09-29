@@ -21,6 +21,11 @@ export const GUIA = {
     intro: { before: "Identifica las", strong: "uniones", after: "de tu tope:" },
     unions: ["UNIÓN 1", "UNIÓN 2", "UNIÓN 3"],
   },
+  enU: {
+    title: { light: "TOPE", strong: "EN U" },
+    intro: { before: "Identifica las", strong: "uniones", after: "de tu tope:" },
+    unions: ["UNIÓN 1", "UNIÓN 2"],
+  },
 
   labels: { largo: "LARGO", ancho: "ANCHO", alto: "ALTO", diametro: "DIÁMETRO" },
 } as const;

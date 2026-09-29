@@ -71,7 +71,7 @@ function Diagram({
               y={t.y}
               textAnchor={t.anchor}
               stroke="none"
-              className="fill-corazza-taupe font-corazza-sans text-[8px] font-semibold tracking-[0.04em]"
+              className="fill-corazza-taupe font-corazza-sans text-[8.5px] font-semibold tracking-[0.04em]"
             >
               {d.label}
             </text>
@@ -162,6 +162,98 @@ const UNIONS: { shapes: Shape[]; badges: Badge[]; dims: Dim[] }[] = [
   },
 ];
 
+// Tope en U: dos uniones (tres piezas cada una). En ambas, el ANCHO de la
+// pieza 2 se mide dentro de la pieza, como en la lamina de referencia.
+const UNIONS_U: { shapes: Shape[]; badges: Badge[]; dims: Dim[] }[] = [
+  {
+    shapes: [
+      { kind: "rect", x: 64, y: 24, w: 34, h: 92 },
+      { kind: "rect", x: 106, y: 24, w: 84, h: 42 },
+      { kind: "rect", x: 198, y: 24, w: 34, h: 92 },
+    ],
+    badges: [
+      { x: 81, y: 70, n: 1 },
+      { x: 174, y: 45, n: 2 },
+      { x: 215, y: 70, n: 3 },
+    ],
+    dims: [
+      { x1: 54, y1: 24, x2: 54, y2: 116, label: LARGO, side: "left" },
+      { x1: 64, y1: 126, x2: 98, y2: 126, label: ANCHO, side: "bottom" },
+      { x1: 106, y1: 13, x2: 190, y2: 13, label: LARGO, side: "top" },
+      { x1: 159, y1: 29, x2: 159, y2: 61, label: ANCHO, side: "left" },
+      { x1: 242, y1: 24, x2: 242, y2: 116, label: LARGO, side: "right" },
+      { x1: 198, y1: 126, x2: 232, y2: 126, label: ANCHO, side: "bottom" },
+    ],
+  },
+  {
+    shapes: [
+      { kind: "rect", x: 64, y: 72, w: 40, h: 44 },
+      { kind: "rect", x: 64, y: 22, w: 160, h: 42 },
+      { kind: "rect", x: 184, y: 72, w: 40, h: 44 },
+    ],
+    badges: [
+      { x: 84, y: 94, n: 1 },
+      { x: 176, y: 43, n: 2 },
+      { x: 204, y: 94, n: 3 },
+    ],
+    dims: [
+      { x1: 64, y1: 11, x2: 224, y2: 11, label: LARGO, side: "top" },
+      { x1: 160, y1: 27, x2: 160, y2: 59, label: ANCHO, side: "left" },
+      { x1: 54, y1: 72, x2: 54, y2: 116, label: LARGO, side: "left" },
+      { x1: 64, y1: 126, x2: 104, y2: 126, label: ANCHO, side: "bottom" },
+      { x1: 234, y1: 72, x2: 234, y2: 116, label: LARGO, side: "right" },
+      { x1: 184, y1: 126, x2: 224, y2: 126, label: ANCHO, side: "bottom" },
+    ],
+  },
+];
+
+// Lamina de uniones (tope en L y tope en U): titulo, frase de la lamina y
+// un diagrama por union.
+function UnionsPanel({
+  id,
+  content,
+  unions,
+  viewBox,
+  columns,
+}: {
+  id: string;
+  content: { title: { light: string; strong: string }; intro: { before: string; strong: string; after: string }; unions: readonly string[] };
+  unions: { shapes: Shape[]; badges: Badge[]; dims: Dim[] }[];
+  viewBox: string;
+  columns: string;
+}) {
+  return (
+    <article className="rounded-2xl border border-corazza-charcoal/15 bg-corazza-cream/25 p-4 sm:p-8 lg:p-10">
+      <div className="px-2 pt-2 sm:p-0">
+        <PanelTitle id={id} light={content.title.light} strong={content.title.strong} />
+      </div>
+      <p className="mt-3 px-2 sm:px-0 font-corazza-sans text-base text-corazza-charcoal sm:text-lg">
+        {content.intro.before} <strong className="font-semibold">{content.intro.strong}</strong> {content.intro.after}
+      </p>
+      <ol className={`mt-8 grid grid-cols-1 gap-5 ${columns}`}>
+        {unions.map((u, i) => (
+          <li key={content.unions[i]} className="flex flex-col rounded-2xl bg-corazza-white p-3 pt-4 sm:p-6">
+            <p
+              id={`${id}-union-${i + 1}`}
+              className="ml-1 self-start rounded-full bg-corazza-charcoal px-4 sm:ml-0 py-1.5 font-corazza-sans text-xs font-semibold tracking-[0.16em] text-corazza-white"
+            >
+              {content.unions[i]}
+            </p>
+            <Diagram
+              labelledBy={`${id} ${id}-union-${i + 1}`}
+              viewBox={viewBox}
+              className="mt-5"
+              shapes={u.shapes}
+              badges={u.badges}
+              dims={u.dims}
+            />
+          </li>
+        ))}
+      </ol>
+    </article>
+  );
+}
+
 export default function GuiaMedicion() {
   return (
     <section id="como-medir" aria-labelledby="como-medir-titulo" className="relative scroll-mt-4 overflow-hidden bg-corazza-white">
@@ -249,33 +341,12 @@ export default function GuiaMedicion() {
 
         {/* Tope en L: tres uniones */}
         <Reveal y={14} className="mt-5">
-          <article className="rounded-2xl border border-corazza-charcoal/15 bg-corazza-cream/25 p-6 sm:p-8 lg:p-10">
-            <PanelTitle id="guia-l" light={GUIA.enL.title.light} strong={GUIA.enL.title.strong} />
-            <p className="mt-3 font-corazza-sans text-base text-corazza-charcoal sm:text-lg">
-              {GUIA.enL.intro.before} <strong className="font-semibold">{GUIA.enL.intro.strong}</strong> {GUIA.enL.intro.after}
-            </p>
+          <UnionsPanel id="guia-l" content={GUIA.enL} unions={UNIONS} viewBox="10 0 220 142" columns="md:grid-cols-3" />
+        </Reveal>
 
-            <ol className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
-              {UNIONS.map((u, i) => (
-                <li key={GUIA.enL.unions[i]} className="flex flex-col rounded-2xl bg-corazza-white p-5 sm:p-6">
-                  <p
-                    id={`guia-union-${i + 1}`}
-                    className="self-start rounded-full bg-corazza-charcoal px-4 py-1.5 font-corazza-sans text-xs font-semibold tracking-[0.16em] text-corazza-white"
-                  >
-                    {GUIA.enL.unions[i]}
-                  </p>
-                  <Diagram
-                    labelledBy={`guia-l guia-union-${i + 1}`}
-                    viewBox="0 0 240 142"
-                    className="mt-5"
-                    shapes={u.shapes}
-                    badges={u.badges}
-                    dims={u.dims}
-                  />
-                </li>
-              ))}
-            </ol>
-          </article>
+        {/* Tope en U: dos uniones */}
+        <Reveal y={14} className="mt-5">
+          <UnionsPanel id="guia-u" content={GUIA.enU} unions={UNIONS_U} viewBox="12 0 272 142" columns="md:grid-cols-2" />
         </Reveal>
       </div>
     </section>
