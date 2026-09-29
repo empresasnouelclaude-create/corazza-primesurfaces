@@ -52,7 +52,10 @@ export function DrawLine({
       style={{ originX: 0, originY: 0 }}
       initial={horizontal ? { scaleX: 0 } : { scaleY: 0 }}
       whileInView={horizontal ? { scaleX: 1 } : { scaleY: 1 }}
-      viewport={{ once: true, margin: "-80px" }}
+      // Margen solo abajo: la linea arranca con escala 0 (ancho o alto
+      // cero) y, cerca del borde lateral en movil, un margen negativo en
+      // los cuatro lados la dejaba fuera del area observada para siempre.
+      viewport={{ once: true, margin: "0px 0px -80px 0px" }}
       transition={reduce ? { duration: 0 } : { duration: 1.4, ease: EASE, delay: 0.15 }}
     />
   );

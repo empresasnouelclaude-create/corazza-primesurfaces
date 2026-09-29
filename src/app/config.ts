@@ -20,12 +20,6 @@ function buildWhatsappLink(message: string): string {
   return `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
 }
 
-// Enlace de WhatsApp con un mensaje armado en el momento (p. ej. el resumen
-// de "Calcula tu superficie"). Usa el mismo numero de arriba.
-export function whatsappLinkWithMessage(message: string): string {
-  return buildWhatsappLink(message);
-}
-
 export const WHATSAPP_LINKS = {
   cotizar: buildWhatsappLink(WHATSAPP_MESSAGES.cotizar),
   cuidados: buildWhatsappLink(WHATSAPP_MESSAGES.cuidados),

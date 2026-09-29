@@ -4,7 +4,6 @@ import {
   ImagesIcon,
   InstagramIcon,
   LayersIcon,
-  RulerIcon,
   ShieldIcon,
   TikTokIcon,
   WhatsAppIcon,
@@ -30,7 +29,6 @@ export default function LinksList() {
     // tal cual, pero "disabled" para que no naveguen a una seccion vacia.
     { href: "#como-funciona", label: "Conoce cómo funciona", Icon: CompassIcon },
     { href: "#superficies", label: "Superficies que protegemos", Icon: LayersIcon },
-    { href: "#calcula", label: "Calcula tu superficie", Icon: RulerIcon },
     { href: "#galeria", label: "Antes y después", Icon: ImagesIcon, disabled: true },
     { href: "#cuidados", label: "Cuidados y garantía", Icon: ShieldIcon, disabled: true },
     {

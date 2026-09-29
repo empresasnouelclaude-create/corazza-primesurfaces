@@ -145,38 +145,3 @@ export function NoticeIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-
-export function PlusIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" className={className} aria-hidden>
-      <path d="M12 5v14M5 12h14" />
-    </svg>
-  );
-}
-
-export function CloseIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" className={className} aria-hidden>
-      <path d="M6 6l12 12M18 6 6 18" />
-    </svg>
-  );
-}
-
-// Regla / medida (para "Calcula tu superficie").
-export function RulerIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.6}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden
-    >
-      <rect x="2.5" y="8" width="19" height="8" rx="1.5" />
-      <path d="M6.5 8v3M10 8v4.5M13.5 8v3M17 8v4.5" />
-    </svg>
-  );
-}

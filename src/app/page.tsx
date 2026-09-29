@@ -1,7 +1,7 @@
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 import LinksList from "./components/LinksList";
-import CalculatorSection from "./components/calculadora/CalculatorSection";
+import GuiaMedicion from "./components/guia/GuiaMedicion";
 import Portafolio from "./components/portafolio/Portafolio";
 
 // Landing "link in bio" de Corazza Prime Surfaces: una sola pagina vertical,
@@ -16,9 +16,9 @@ import Portafolio from "./components/portafolio/Portafolio";
 // #como-funciona (NUESTRO SERVICIO) y #superficies (SUPERFICIES), asi que
 // esos botones quedan activos con el mismo href de siempre.
 //
-// CALCULA TU SUPERFICIE (#calcula): herramienta interactiva justo despues
-// de SUPERFICIES. Formas, textos y limites en ./calculadora/config.ts;
-// formulas (con pruebas: npm test) en ./calculadora/formulas.ts.
+// ¿CÓMO MEDIR MI TOPE? (#como-medir): guia de medicion justo despues de
+// SUPERFICIES. Su texto (literal de las laminas de referencia) vive en
+// ./guia-medicion.ts.
 //
 // ARCHIVADO (a proposito, no un olvido): "Antes y despues" y "Cuidados y
 // garantia" siguen sin mostrarse -- el PDF no trae contenido para ellas.
@@ -31,7 +31,7 @@ export default function CorazzaPage() {
     <main className="scroll-smooth">
       <Hero />
       <LinksList />
-      <Portafolio afterSuperficies={<CalculatorSection />} />
+      <Portafolio afterSuperficies={<GuiaMedicion />} />
       <Footer />
     </main>
   );
