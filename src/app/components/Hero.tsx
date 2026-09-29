@@ -49,28 +49,27 @@ export default function Hero() {
                 <WhatsAppIcon className="h-4 w-4" />
                 Cotiza tu superficie
               </a>
-              {/* "Como funciona" esta archivada hasta tener contenido
-                  redactado (ver page.tsx) -- se deja el boton en su lugar,
-                  con el mismo aspecto, pero como <span> (no <a>): no hay
-                  seccion a la que llevar todavia. */}
-              <span
-                className="inline-flex items-center justify-center gap-2.5 rounded-full border border-corazza-white/25 px-7 py-3.5 font-corazza-sans text-sm font-semibold text-corazza-white transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-corazza-white/10 active:scale-[0.97] cursor-default"
-                aria-disabled="true"
+              <a
+                href="#como-funciona"
+                className="inline-flex items-center justify-center gap-2.5 rounded-full border border-corazza-white/25 px-7 py-3.5 font-corazza-sans text-sm font-semibold text-corazza-white transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-corazza-white/10 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corazza-white"
               >
                 <CompassIcon className="h-4 w-4" />
                 Conoce cómo funciona
-              </span>
+              </a>
             </div>
           </Reveal>
         </div>
 
-        <Reveal delay={0.15} className="hidden lg:block">
+        {/* Foto de la portada del PDF comercial (una superficie de marmol en
+            un ambiente real). En escritorio va al lado del titulo; en movil,
+            debajo de los botones, con el mismo contenedor 4:5. */}
+        <Reveal delay={0.15} className="mx-auto w-full max-w-md lg:max-w-none">
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl">
             <Image
-              src="/hero-producto.jpg"
-              alt="Kit de cuidado Corazza Prime Surfaces: ambientador y paños de microfibra"
+              src="/portafolio/cocina-isla-marmol.jpg"
+              alt="Cocina luminosa con isla de mármol claro veteado, taburetes tapizados de madera y ventanales con vista al mar."
               fill
-              sizes="480px"
+              sizes="(min-width: 1024px) 480px, (min-width: 448px) 448px, 100vw"
               className="object-cover object-center"
               priority
             />

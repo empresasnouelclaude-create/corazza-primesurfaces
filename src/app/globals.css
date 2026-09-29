@@ -6,3 +6,17 @@ html,
 body {
   height: 100%;
 }
+
+/* Anclas internas (#como-funciona, #superficies...): desplazamiento suave
+   solo si la persona no pidio reducir el movimiento. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Seleccion de texto con la paleta de marca (en vez del azul del sistema). */
+::selection {
+  background-color: #dacfb6;
+  color: #3a2b20;
+}
