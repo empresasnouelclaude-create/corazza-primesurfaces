@@ -21,6 +21,15 @@ El **portafolio comercial** (secciones debajo de los enlaces, tomadas del PDF
 **`src/app/portafolio.ts`**. Ese texto está copiado literalmente del PDF:
 si el documento cambia, se reemplaza ahí tal cual, sin reescribirlo.
 
+La herramienta **"Calcula tu superficie"** (sección `#calcula`) se edita en
+**`src/app/calculadora/config.ts`**: formas, textos, mensajes de error, límites
+de medida y el mensaje de WhatsApp (usa el mismo número de `config.ts`). Las
+fórmulas están aisladas en `src/app/calculadora/formulas.ts` y se prueban con:
+
+```bash
+npm test
+```
+
 ## Reemplazar fotos
 
 Las imágenes viven en `public/`:

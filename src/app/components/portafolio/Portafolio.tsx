@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { ReactNode } from "react";
 import {
   APLICACIONES,
   BENEFICIOS,
@@ -443,13 +444,17 @@ function Tecnologia() {
   );
 }
 
-export default function Portafolio() {
+// `afterSuperficies`: espacio para insertar una seccion propia justo despues
+// de SUPERFICIES (hoy, "Calcula tu superficie"), sin mezclarla con el
+// contenido del PDF.
+export default function Portafolio({ afterSuperficies }: { afterSuperficies?: ReactNode }) {
   return (
     <>
       <Portada />
       <Manifiesto />
       <Solucion />
       <Superficies />
+      {afterSuperficies}
       <Aplicaciones />
       <Beneficios />
       <Servicio />
