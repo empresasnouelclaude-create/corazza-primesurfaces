@@ -62,6 +62,6 @@ Abre http://localhost:3000
 3. Deploy.
 4. En Settings → Domains, agrega tu dominio comprado y sigue las
    instrucciones de DNS de Vercel.
-5. Actualiza `CORAZZA_DOMAIN` en `src/app/config.ts` con el dominio real
+5. `CORAZZA_DOMAIN` en `src/app/config.ts` ya apunta a `corazza.com.do`; cámbialo solo si cambia el dominio
    (para que las tarjetas de WhatsApp/redes sociales muestren la URL
    correcta al compartir el link).

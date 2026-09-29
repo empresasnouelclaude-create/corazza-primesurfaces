@@ -91,10 +91,7 @@ export const HOW_IT_WORKS_STEPS = [
 ] as const;
 
 // --- Dominio ----------------------------------------------------------------
-// TODO(cliente): cuando el dominio propio este conectado en Vercel (Settings
-// -> Domains), reemplaza este valor por el dominio real. Se usa solo para
-// metadataBase en layout.tsx (URLs absolutas de Open Graph/canonical). Este
-// proyecto es independiente -- no necesita ningun archivo de proxy/middleware
-// para que el dominio funcione, a diferencia de una app dentro de otra
-// plataforma: Vercel sirve la "/" de este proyecto directo en ese dominio.
-export const CORAZZA_DOMAIN = "corazzaprimesurfaces.com";
+// Dominio propio del sitio (conectado en Vercel: Settings -> Domains). Se
+// usa solo para metadataBase en layout.tsx (URLs absolutas de Open Graph y
+// canonical, p. ej. la tarjeta que aparece al compartir el link).
+export const CORAZZA_DOMAIN = "corazza.com.do";
