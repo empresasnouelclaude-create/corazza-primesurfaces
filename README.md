@@ -21,14 +21,8 @@ El **portafolio comercial** (secciones debajo de los enlaces, tomadas del PDF
 **`src/app/portafolio.ts`**. Ese texto está copiado literalmente del PDF:
 si el documento cambia, se reemplaza ahí tal cual, sin reescribirlo.
 
-La herramienta **"Calcula tu superficie"** (sección `#calcula`) se edita en
-**`src/app/calculadora/config.ts`**: formas, textos, mensajes de error, límites
-de medida y el mensaje de WhatsApp (usa el mismo número de `config.ts`). Las
-fórmulas están aisladas en `src/app/calculadora/formulas.ts` y se prueban con:
-
-```bash
-npm test
-```
+La guía **"¿CÓMO MEDIR MI TOPE?"** (sección `#como-medir`) toma su texto de
+**`src/app/guia-medicion.ts`**.
 
 ## Reemplazar fotos
 
@@ -68,6 +62,6 @@ Abre http://localhost:3000
 3. Deploy.
 4. En Settings → Domains, agrega tu dominio comprado y sigue las
    instrucciones de DNS de Vercel.
-5. Actualiza `CORAZZA_DOMAIN` en `src/app/config.ts` con el dominio real
+5. `CORAZZA_DOMAIN` en `src/app/config.ts` ya apunta a `corazza.com.do`; cámbialo solo si cambia el dominio
    (para que las tarjetas de WhatsApp/redes sociales muestren la URL
    correcta al compartir el link).

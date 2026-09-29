@@ -445,7 +445,7 @@ function Tecnologia() {
 }
 
 // `afterSuperficies`: espacio para insertar una seccion propia justo despues
-// de SUPERFICIES (hoy, "Calcula tu superficie"), sin mezclarla con el
+// de SUPERFICIES (hoy, la guia "¿CÓMO MEDIR MI TOPE?"), sin mezclarla con el
 // contenido del PDF.
 export default function Portafolio({ afterSuperficies }: { afterSuperficies?: ReactNode }) {
   return (
