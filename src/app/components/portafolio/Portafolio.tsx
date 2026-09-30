@@ -446,7 +446,8 @@ function Tecnologia() {
 
 // `afterSuperficies`: espacio para insertar una seccion propia justo despues
 // de SUPERFICIES (hoy, la guia "¿CÓMO MEDIR MI TOPE?"), sin mezclarla con el
-// contenido del PDF.
+// contenido del PDF. Los acabados (Tecnologia) van justo antes de esa guia,
+// para que el cliente elija acabado antes de ver como medir.
 export default function Portafolio({ afterSuperficies }: { afterSuperficies?: ReactNode }) {
   return (
     <>
@@ -454,12 +455,12 @@ export default function Portafolio({ afterSuperficies }: { afterSuperficies?: Re
       <Manifiesto />
       <Solucion />
       <Superficies />
+      <Tecnologia />
       {afterSuperficies}
       <Aplicaciones />
       <Beneficios />
       <Servicio />
       <Experiencia />
-      <Tecnologia />
     </>
   );
 }

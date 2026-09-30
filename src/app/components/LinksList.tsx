@@ -1,9 +1,9 @@
 import { SOCIAL_LINKS, WHATSAPP_LINKS } from "../config";
 import {
   CompassIcon,
-  ImagesIcon,
   InstagramIcon,
   LayersIcon,
+  RulerIcon,
   ShieldIcon,
   TikTokIcon,
   WhatsAppIcon,
@@ -24,12 +24,14 @@ export default function LinksList() {
       external: true,
     },
     // "Como funciona" y "Superficies" apuntan a las secciones del
-    // portafolio (NUESTRO SERVICIO y SUPERFICIES). Galeria y Cuidados siguen
-    // archivadas hasta tener contenido (ver page.tsx) -- visibles en la lista
-    // tal cual, pero "disabled" para que no naveguen a una seccion vacia.
+    // portafolio (NUESTRO SERVICIO y SUPERFICIES); "Cómo medir" (antes el
+    // boton de "Antes y después") lleva a la guia ¿CÓMO MEDIR MI TOPE?.
+    // Cuidados sigue archivada hasta tener contenido (ver page.tsx) --
+    // visible en la lista tal cual, pero "disabled" para que no navegue a
+    // una seccion vacia.
     { href: "#como-funciona", label: "Conoce cómo funciona", Icon: CompassIcon },
     { href: "#superficies", label: "Superficies que protegemos", Icon: LayersIcon },
-    { href: "#galeria", label: "Antes y después", Icon: ImagesIcon, disabled: true },
+    { href: "#como-medir", label: "Cómo medir", Icon: RulerIcon },
     { href: "#cuidados", label: "Cuidados y garantía", Icon: ShieldIcon, disabled: true },
     {
       href: SOCIAL_LINKS.instagram,

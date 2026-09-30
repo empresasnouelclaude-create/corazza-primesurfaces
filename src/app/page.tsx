@@ -16,12 +16,13 @@ import Portafolio from "./components/portafolio/Portafolio";
 // #como-funciona (NUESTRO SERVICIO) y #superficies (SUPERFICIES), asi que
 // esos botones quedan activos con el mismo href de siempre.
 //
-// ¿CÓMO MEDIR MI TOPE? (#como-medir): guia de medicion justo despues de
-// SUPERFICIES. Su texto (literal de las laminas de referencia) vive en
+// ¿CÓMO MEDIR MI TOPE? (#como-medir): guia de medicion despues de
+// SUPERFICIES y de los acabados (Tecnologia); el boton "Cómo medir" de
+// LinksList apunta aca. Su texto (literal de las laminas de referencia) vive en
 // ./guia-medicion.ts.
 //
-// ARCHIVADO (a proposito, no un olvido): "Antes y despues" y "Cuidados y
-// garantia" siguen sin mostrarse -- el PDF no trae contenido para ellas.
+// ARCHIVADO (a proposito, no un olvido): "Antes y despues" (su boton ahora
+// es "Cómo medir") y "Cuidados y garantia" siguen sin mostrarse -- el PDF no trae contenido para ellas.
 // Sus componentes siguen intactos en ./components/ (Gallery.tsx, Care.tsx),
 // igual que las versiones anteriores de HowItWorks.tsx y Surfaces.tsx (ya
 // reemplazadas por las del portafolio). Para publicar Galeria/Cuidados, se
