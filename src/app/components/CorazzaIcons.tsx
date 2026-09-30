@@ -108,6 +108,25 @@ export function ImagesIcon({ className }: { className?: string }) {
   );
 }
 
+// Regla/cinta metrica para "Cómo medir".
+export function RulerIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden
+    >
+      <rect x="2.5" y="8" width="19" height="8" rx="1.5" />
+      <path d="M6.5 8v3M10 8v4.5M13.5 8v3M17 8v4.5" />
+    </svg>
+  );
+}
+
 export function ShieldIcon({ className }: { className?: string }) {
   return (
     <svg
