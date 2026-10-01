@@ -148,6 +148,9 @@ export type Finish = {
   name: string;
   subtitle: string;
   specs: readonly { label: string; value: string }[];
+  // Foto del tope con la lamina levantada, recortada de las piezas de
+  // Instagram del cliente (solo la fotografia, sin el texto ni el logo).
+  image: { src: string; width: number; height: number; alt: string };
 };
 
 export const TECNOLOGIA = {
@@ -165,6 +168,12 @@ export const TECNOLOGIA = {
         { label: "GARANTÍA", value: "5 años" },
         { label: "VIDA ÚTIL", value: "10 años*" },
       ],
+      image: {
+        src: "/portafolio/acabado-high-gloss.jpg",
+        width: 694,
+        height: 800,
+        alt: "Mano levantando la lámina High Gloss, transparente y brillante, del borde de un tope de mármol",
+      },
     },
     {
       id: "ultra-matte",
@@ -177,6 +186,12 @@ export const TECNOLOGIA = {
         { label: "GARANTÍA", value: "7 años" },
         { label: "VIDA ÚTIL", value: "10 años*" },
       ],
+      image: {
+        src: "/portafolio/acabado-ultra-matte.jpg",
+        width: 694,
+        height: 800,
+        alt: "Mano levantando la lámina Ultra Matte, de acabado mate, del borde de un tope de mármol",
+      },
     },
   ] satisfies Finish[],
   footnote:

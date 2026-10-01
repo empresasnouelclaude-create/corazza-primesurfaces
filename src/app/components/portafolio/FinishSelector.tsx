@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Image from "next/image";
 import { useRef, useState, type KeyboardEvent } from "react";
 import type { Finish } from "../../portafolio";
 
@@ -128,42 +129,68 @@ export default function FinishSelector({ finishes }: { finishes: readonly Finish
         id="acabado-panel"
         aria-labelledby={`acabado-tab-${finish.id}`}
         tabIndex={0}
-        className="rounded-2xl bg-corazza-white p-6 text-corazza-charcoal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-corazza-beige sm:p-8 lg:col-span-8 lg:p-10"
+        className="grid overflow-hidden rounded-2xl bg-corazza-white text-corazza-charcoal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-corazza-beige sm:grid-cols-5 lg:col-span-8"
       >
-        <p className="font-corazza-sans text-[11px] font-semibold tracking-[0.24em] text-corazza-taupe">
-          {finish.brand}
-        </p>
-        <div className="mt-2 min-h-[2.75rem]">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.h3
-              key={finish.name}
-              {...valueMotion}
-              className="font-corazza-serif text-4xl font-semibold leading-none tracking-wide sm:text-[2.75rem]"
+        {/* Foto del acabado elegido: cambia con un fundido al cambiar de
+            pestaña. Las dos se precargan para que el cambio sea inmediato. */}
+        <div className="relative aspect-[4/3] bg-corazza-cream sm:col-span-2 sm:aspect-auto sm:min-h-full">
+          {finishes.map((item, i) => (
+            <motion.div
+              key={item.id}
+              aria-hidden={i !== active}
+              initial={false}
+              animate={{ opacity: i === active ? 1 : 0 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.4, ease: EASE }}
+              className="absolute inset-0"
             >
-              {finish.name}
-            </motion.h3>
-          </AnimatePresence>
-        </div>
-        <p className="mt-3 font-corazza-sans text-[11px] font-medium tracking-[0.18em] text-corazza-taupe">
-          {finish.subtitle}
-        </p>
-
-        <dl className="mt-8 grid grid-cols-1 gap-x-10 gap-y-6 border-t border-corazza-charcoal/10 pt-8 sm:grid-cols-2">
-          {finish.specs.map((spec) => (
-            <div key={spec.label}>
-              <dt className="font-corazza-sans text-[11px] font-semibold tracking-[0.16em] text-corazza-taupe">
-                {spec.label}
-              </dt>
-              <dd className="mt-1.5 font-corazza-sans text-base leading-snug text-corazza-charcoal">
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.span key={spec.value} {...valueMotion} className="block">
-                    {spec.value}
-                  </motion.span>
-                </AnimatePresence>
-              </dd>
-            </div>
+              <Image
+                src={item.image.src}
+                width={item.image.width}
+                height={item.image.height}
+                alt={i === active ? item.image.alt : ""}
+                sizes="(min-width: 1152px) 300px, (min-width: 640px) 40vw, 100vw"
+                className="h-full w-full object-cover"
+              />
+            </motion.div>
           ))}
-        </dl>
+        </div>
+
+        <div className="p-6 sm:col-span-3 sm:p-8 lg:p-10">
+          <p className="font-corazza-sans text-[11px] font-semibold tracking-[0.24em] text-corazza-taupe">
+            {finish.brand}
+          </p>
+          <div className="mt-2 min-h-[2.75rem]">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.h3
+                key={finish.name}
+                {...valueMotion}
+                className="font-corazza-serif text-4xl font-semibold leading-none tracking-wide sm:text-[2.75rem]"
+              >
+                {finish.name}
+              </motion.h3>
+            </AnimatePresence>
+          </div>
+          <p className="mt-3 font-corazza-sans text-[11px] font-medium tracking-[0.18em] text-corazza-taupe">
+            {finish.subtitle}
+          </p>
+
+          <dl className="mt-8 grid grid-cols-1 gap-x-10 gap-y-6 border-t border-corazza-charcoal/10 pt-8 sm:grid-cols-2">
+            {finish.specs.map((spec) => (
+              <div key={spec.label}>
+                <dt className="font-corazza-sans text-[11px] font-semibold tracking-[0.16em] text-corazza-taupe">
+                  {spec.label}
+                </dt>
+                <dd className="mt-1.5 font-corazza-sans text-base leading-snug text-corazza-charcoal">
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.span key={spec.value} {...valueMotion} className="block">
+                      {spec.value}
+                    </motion.span>
+                  </AnimatePresence>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       </div>
     </div>
   );
