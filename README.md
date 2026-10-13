@@ -38,6 +38,7 @@ Las imágenes viven en `public/`:
 - `portafolio/muestras-materiales.webp` — "Superficies"
 - `portafolio/apartamento-panoramico.webp` — "Aplicaciones"
 - `portafolio/gotas-marmol.webp` — "Beneficios"
+- `portafolio/servicio-medicion.webp` — "Nuestro servicio"
 - `portafolio/acabado-*.jpg` — selector High Gloss / Ultra Matte
 
 Qué foto usa cada sección se define en `PORTFOLIO_IMAGES` de

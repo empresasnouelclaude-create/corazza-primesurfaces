@@ -341,6 +341,17 @@ function Servicio() {
           </Reveal>
         </div>
 
+        <RevealImage className="relative mt-12 aspect-[4/3] w-full rounded-2xl bg-corazza-cream sm:aspect-[16/9] lg:aspect-[21/9]">
+          <Image
+            src={resolve(PORTFOLIO_IMAGES.medicion).src}
+            width={resolve(PORTFOLIO_IMAGES.medicion).width}
+            height={resolve(PORTFOLIO_IMAGES.medicion).height}
+            alt={PORTFOLIO_IMAGES.medicion.alt}
+            sizes="(min-width: 1152px) 1088px, 100vw"
+            className="h-full w-full object-cover object-[center_42%] lg:object-[center_78%]"
+          />
+        </RevealImage>
+
         {/* Linea de tiempo: vertical en movil, horizontal desde lg. El
             numero va dentro de un circulo sobre la linea -- el orden de los
             pasos es parte del contenido. */}
