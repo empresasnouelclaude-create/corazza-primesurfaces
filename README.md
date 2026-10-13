@@ -30,11 +30,18 @@ Las imágenes viven en `public/`:
 
 - `corazza-logo-cream.png` — logo completo (fondo oscuro)
 - `corazza-isotipo.png` — solo el isotipo de las dos ondas
-- `hero-producto.jpg` — foto del hero (escritorio) y de "Experiencia Corazza"
-- `portafolio/cocina-isla-marmol.jpg` — foto de la portada del PDF (recortada
-  para excluir el texto incrustado)
-- `portafolio/isla-marmol-detalle.jpg` — foto interior del PDF (340 × 512,
-  baja resolución)
+- `hero-producto.jpg` — foto del kit ("Experiencia Corazza")
+- `portafolio/cocina-isla-marmol.jpg` — foto del hero (portada del PDF,
+  recortada para excluir el texto incrustado)
+- `portafolio/comedor-mesa-marmol.webp` — "Portafolio comercial"
+- `portafolio/instalacion-lamina.webp` — "La solución"
+- `portafolio/muestras-materiales.webp` — "Superficies"
+- `portafolio/apartamento-panoramico.webp` — "Aplicaciones"
+- `portafolio/gotas-marmol.webp` — "Beneficios"
+- `portafolio/acabado-*.jpg` — selector High Gloss / Ultra Matte
+
+Qué foto usa cada sección se define en `PORTFOLIO_IMAGES` de
+`src/app/portafolio.ts` (ahí también va el texto alternativo de cada una).
 
 Para las fotos del portafolio hay un campo `hiRes` en `src/app/portafolio.ts`:
 al agregar ahí una versión de mayor resolución de la misma foto, la página la
