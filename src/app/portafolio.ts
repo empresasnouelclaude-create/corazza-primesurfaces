@@ -78,6 +78,12 @@ export const PORTFOLIO_IMAGES = {
     height: 1254,
     alt: "Gotas de agua sobre un tope de mármol pulido junto a una taza de café y una rodaja de limón.",
   },
+  medicion: {
+    src: "/portafolio/servicio-medicion.webp",
+    width: 1448,
+    height: 1086,
+    alt: "Técnico midiendo con cinta métrica un tope de mármol claro, con un rollo de lámina transparente y una espátula sobre el tope.",
+  },
   // Foto real del kit de cuidado que ya usaba la landing (hero, escritorio):
   // muestra exactamente lo que enumera la pagina 8 (atomizador, dos toallas
   // de microfibra y tarjeta con QR). En el PDF esa pagina repite la foto de
