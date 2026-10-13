@@ -46,21 +46,42 @@ export const PORTFOLIO_IMAGES = {
     height: 1024,
     alt: "Cocina abierta con isla de mármol claro veteado, taburetes tapizados de madera y vista al mar a través de ventanales.",
   },
-  // Paginas 2, 3, 4, 5 y 8 del PDF: la misma fotografia, incrustada a solo
-  // 340 x 512 px (baja resolucion). Se usa a tamaño contenido para que no
-  // se note el pixelado.
-  // TODO(cliente): suministrar esta fotografia a mayor resolucion (ideal
-  // >= 1020 x 1536 px) y agregarla en `hiRes`.
-  detalle: {
-    src: "/portafolio/isla-marmol-detalle.jpg",
-    width: 340,
-    height: 512,
-    alt: "Detalle de una isla de cocina en mármol veteado con canto a inglete, grifo en acabado bronce y gabinetes de madera oscura.",
+  // Fotografias propias de Corazza (generadas a pedido del cliente para no
+  // repetir la cocina de la portada en varias secciones).
+  comedor: {
+    src: "/portafolio/comedor-mesa-marmol.webp",
+    width: 1122,
+    height: 1402,
+    alt: "Comedor luminoso con mesa larga de mármol blanco veteado, sillas de roble tapizadas en lino, jarrón con ramas de olivo y ventanales con vista al mar.",
+  },
+  instalacion: {
+    src: "/portafolio/instalacion-lamina.webp",
+    width: 1024,
+    height: 1536,
+    alt: "Mano con guante aplicando con una espátula de fieltro una lámina transparente sobre el canto de un tope de mármol beige veteado.",
+  },
+  materiales: {
+    src: "/portafolio/muestras-materiales.webp",
+    width: 1672,
+    height: 941,
+    alt: "Muestras cuadradas de mármol blanco, granito negro, cuarzo gris, madera de nogal y porcelanato claro sobre un fondo de lino.",
+  },
+  panoramica: {
+    src: "/portafolio/apartamento-panoramico.webp",
+    width: 1916,
+    height: 821,
+    alt: "Apartamento abierto al atardecer con isla de cocina en travertino, barra y escritorio de nogal, y ventanales con vista al mar.",
+  },
+  gotas: {
+    src: "/portafolio/gotas-marmol.webp",
+    width: 1254,
+    height: 1254,
+    alt: "Gotas de agua sobre un tope de mármol pulido junto a una taza de café y una rodaja de limón.",
   },
   // Foto real del kit de cuidado que ya usaba la landing (hero, escritorio):
   // muestra exactamente lo que enumera la pagina 8 (atomizador, dos toallas
   // de microfibra y tarjeta con QR). En el PDF esa pagina repite la foto de
-  // la cocina; para volver a esa foto, cambia esta entrada por `detalle`.
+  // la cocina.
   kit: {
     src: "/hero-producto.jpg",
     width: 1230,

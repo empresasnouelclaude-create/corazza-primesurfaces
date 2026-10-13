@@ -53,7 +53,7 @@ const TITLE =
 
 // --- Pagina 1 ------------------------------------------------------------------
 function Portada() {
-  const img = resolve(PORTFOLIO_IMAGES.cocina);
+  const img = resolve(PORTFOLIO_IMAGES.comedor);
   return (
     <section id="portafolio" aria-labelledby="portada-titulo" className="scroll-mt-4 bg-corazza-white">
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 pb-8 pt-20 sm:px-8 sm:pt-24 lg:grid-cols-12 lg:items-end lg:gap-16 lg:pb-12 lg:pt-32">
@@ -81,7 +81,7 @@ function Portada() {
             src={img.src}
             width={img.width}
             height={img.height}
-            alt={PORTFOLIO_IMAGES.cocina.alt}
+            alt={PORTFOLIO_IMAGES.comedor.alt}
             sizes="(min-width: 1152px) 640px, (min-width: 1024px) 56vw, 100vw"
             className="h-full w-full object-cover"
           />
@@ -132,22 +132,21 @@ function Manifiesto() {
 
 // --- Pagina 3 ------------------------------------------------------------------
 function Solucion() {
-  const img = resolve(PORTFOLIO_IMAGES.detalle);
+  const img = resolve(PORTFOLIO_IMAGES.instalacion);
   return (
     <section aria-labelledby="solucion-titulo" className="bg-corazza-white">
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-14 px-6 pb-24 sm:px-8 sm:pb-32 md:grid-cols-12 md:gap-12 lg:gap-20">
-        {/* Imagen de baja resolucion en el PDF (340 x 512): se muestra a un
-            tamaño contenido, con un plano de color desplazado detras que le
-            da presencia sin estirarla. */}
-        <div className="relative mx-auto w-full max-w-[20rem] md:col-span-5 md:max-w-none lg:col-span-4 lg:col-start-2">
+        {/* Foto vertical (2:3) de la instalacion, con un plano de color
+            desplazado detras que le da presencia. */}
+        <div className="relative mx-auto w-full max-w-[22rem] md:col-span-5 md:max-w-none lg:col-span-4 lg:col-start-2">
           <span aria-hidden className="absolute -bottom-5 -right-5 h-full w-full rounded-2xl bg-corazza-cream/70 sm:-bottom-6 sm:-right-6" />
-          <RevealImage className="relative aspect-[340/512] w-full rounded-2xl bg-corazza-cream">
+          <RevealImage className="relative aspect-[2/3] w-full rounded-2xl bg-corazza-cream">
             <Image
               src={img.src}
               width={img.width}
               height={img.height}
-              alt={PORTFOLIO_IMAGES.detalle.alt}
-              sizes="(min-width: 768px) 340px, 320px"
+              alt={PORTFOLIO_IMAGES.instalacion.alt}
+              sizes="(min-width: 1024px) 360px, (min-width: 768px) 38vw, 352px"
               className="h-full w-full object-cover"
             />
           </RevealImage>
@@ -198,7 +197,18 @@ function Superficies() {
           </Reveal>
         </div>
 
-        <ul className="mt-14 grid grid-cols-2 gap-x-6 sm:gap-x-10 lg:grid-cols-3">
+        <RevealImage className="relative mt-12 aspect-[16/9] w-full rounded-2xl bg-corazza-cream">
+          <Image
+            src={resolve(PORTFOLIO_IMAGES.materiales).src}
+            width={resolve(PORTFOLIO_IMAGES.materiales).width}
+            height={resolve(PORTFOLIO_IMAGES.materiales).height}
+            alt={PORTFOLIO_IMAGES.materiales.alt}
+            sizes="(min-width: 1152px) 1088px, 100vw"
+            className="h-full w-full object-cover"
+          />
+        </RevealImage>
+
+        <ul className="mt-12 grid grid-cols-2 gap-x-6 sm:gap-x-10 lg:grid-cols-3">
           {SUPERFICIES.items.map((item, i) => (
             <li key={item} className="border-t border-corazza-charcoal/15">
               <Reveal delay={i * 0.05} y={12}>
@@ -216,21 +226,21 @@ function Superficies() {
 
 // --- Pagina 5 ------------------------------------------------------------------
 function Aplicaciones() {
-  const img = resolve(PORTFOLIO_IMAGES.cocina);
+  const img = resolve(PORTFOLIO_IMAGES.panoramica);
   return (
     <section aria-labelledby="aplicaciones-titulo" className="bg-corazza-white">
       <div className="mx-auto max-w-6xl px-6 pt-24 sm:px-8 sm:pt-32">
-        {/* Misma fotografia de la portada, en encuadre panoramico sobre la
-            isla y el piso: otra lectura del espacio, no una copia del bloque
-            anterior. El texto nunca va encima de la foto (panel solido). */}
+        {/* Panoramica (21:9) de un espacio con isla, barra y escritorio: las
+            superficies que nombra el texto. En movil se recorta hacia la isla.
+            El texto nunca va encima de la foto (panel solido). */}
         <RevealImage className="relative aspect-[4/3] w-full rounded-2xl bg-corazza-cream sm:aspect-[16/9] lg:aspect-[21/9]">
           <Image
             src={img.src}
             width={img.width}
             height={img.height}
-            alt=""
+            alt={PORTFOLIO_IMAGES.panoramica.alt}
             sizes="(min-width: 1152px) 1088px, 100vw"
-            className="h-full w-full object-cover object-[center_62%]"
+            className="h-full w-full object-cover object-[28%_center] lg:object-center"
           />
         </RevealImage>
 
@@ -259,15 +269,27 @@ function Beneficios() {
   return (
     <section aria-labelledby="beneficios-titulo" className="bg-corazza-white">
       <div className="mx-auto max-w-6xl px-6 py-24 sm:px-8 sm:py-32">
-        <div className="max-w-2xl">
-          <Reveal>
-            <Eyebrow>{BENEFICIOS.eyebrow}</Eyebrow>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <h2 id="beneficios-titulo" className={`${TITLE} mt-6 text-4xl text-corazza-charcoal sm:text-5xl lg:text-[3.5rem]`}>
-              {BENEFICIOS.title}
-            </h2>
-          </Reveal>
+        <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-6">
+            <Reveal>
+              <Eyebrow>{BENEFICIOS.eyebrow}</Eyebrow>
+            </Reveal>
+            <Reveal delay={0.08}>
+              <h2 id="beneficios-titulo" className={`${TITLE} mt-6 text-4xl text-corazza-charcoal sm:text-5xl lg:text-[3.5rem]`}>
+                {BENEFICIOS.title}
+              </h2>
+            </Reveal>
+          </div>
+          <RevealImage className="relative aspect-square w-full rounded-2xl bg-corazza-cream lg:col-span-5 lg:col-start-8">
+            <Image
+              src={resolve(PORTFOLIO_IMAGES.gotas).src}
+              width={resolve(PORTFOLIO_IMAGES.gotas).width}
+              height={resolve(PORTFOLIO_IMAGES.gotas).height}
+              alt={PORTFOLIO_IMAGES.gotas.alt}
+              sizes="(min-width: 1152px) 450px, (min-width: 1024px) 40vw, 100vw"
+              className="h-full w-full object-cover"
+            />
+          </RevealImage>
         </div>
 
         <ol className="mt-16 grid grid-cols-1 gap-x-16 sm:grid-cols-2">
