@@ -24,6 +24,29 @@ si el documento cambia, se reemplaza ahí tal cual, sin reescribirlo.
 La guía **"¿CÓMO MEDIR MI TOPE?"** (sección `#como-medir`) toma su texto de
 **`src/app/guia-medicion.ts`**.
 
+## Calculadora interna de ventas (`/calculadora`)
+
+Herramienta para los vendedores: medir varias superficies de un cliente,
+calcular pies cuadrados, film recomendado (con margen) y cotización, y ver
+un reporte en pantalla. Sigue "Especificaciones Calculadora Corazza" v1.0.
+
+- Dirección: `https://corazza.com.do/calculadora` (no está enlazada desde la
+  landing y está excluida de Google con `noindex`).
+- No tiene contraseña: cualquiera con el enlace puede abrirla. No guarda
+  datos en ningún servidor; si se recarga la página, se pierde lo escrito.
+- Fórmulas: `src/app/calculadora/formulas.ts`. Textos y opciones:
+  `src/app/calculadora/config.ts`. Estado (agregar, borrar, reset, reporte):
+  `src/app/calculadora/state.ts`.
+- Pruebas (incluyen las de aceptación de la especificación):
+
+```bash
+npm test
+```
+
+Para protegerla con contraseña más adelante: Vercel → Settings →
+Deployment Protection (plan Pro), o agregar una contraseña propia en
+`src/proxy.ts`/middleware.
+
 ## Reemplazar fotos
 
 Las imágenes viven en `public/`:
