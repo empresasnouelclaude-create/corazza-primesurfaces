@@ -11,6 +11,7 @@ import {
   SOLUCION,
   SUPERFICIES,
   TECNOLOGIA,
+  VISIBLE_FINISHES,
   type PortfolioImage,
 } from "../../portafolio";
 import { NoticeIcon } from "../CorazzaIcons";
@@ -449,13 +450,13 @@ function Tecnologia() {
           </Reveal>
           <Reveal delay={0.08}>
             <h2 id="tecnologia-titulo" className={`${TITLE} mt-6 text-4xl text-corazza-white sm:text-5xl lg:text-[3.5rem]`}>
-              {TECNOLOGIA.title}
+              {VISIBLE_FINISHES.length > 1 ? TECNOLOGIA.title : TECNOLOGIA.titleSingle}
             </h2>
           </Reveal>
         </div>
 
         <Reveal delay={0.12} className="mt-14">
-          <FinishSelector finishes={TECNOLOGIA.finishes} />
+          <FinishSelector finishes={VISIBLE_FINISHES} />
         </Reveal>
 
         {/* Nota del PDF sobre la vida util estimada: visible y de alto
