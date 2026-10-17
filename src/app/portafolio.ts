@@ -174,6 +174,8 @@ export type Finish = {
   brand: string;
   name: string;
   subtitle: string;
+  /** false = oculto en la web (se conserva aqui para volver a mostrarlo). */
+  visible: boolean;
   specs: readonly { label: string; value: string }[];
   // Foto del tope con la lamina levantada, recortada de las piezas de
   // Instagram del cliente (solo la fotografia, sin el texto ni el logo).
@@ -182,13 +184,16 @@ export type Finish = {
 
 export const TECNOLOGIA = {
   eyebrow: "TECNOLOGÍA DE PROTECCIÓN",
+  // El titulo depende de cuantos acabados se muestran.
   title: "Dos acabados. Una misma filosofía de protección.",
+  titleSingle: "Una filosofía de protección.",
   finishes: [
     {
       id: "high-gloss",
       brand: "CORAZZA",
       name: "HIGH GLOSS",
       subtitle: "PREMIUM SURFACE PROTECTION FILM",
+      visible: true,
       specs: [
         { label: "ACABADO", value: "Brillo super transparente" },
         { label: "TOP COATING", value: "Hidrofóbico + autorreparación con calor" },
@@ -207,6 +212,9 @@ export const TECNOLOGIA = {
       brand: "CORAZZA",
       name: "ULTRA MATTE",
       subtitle: "PREMIUM SURFACE PROTECTION FILM",
+      // Oculto por ahora: Corazza solo tiene High Gloss disponible.
+      // Para volver a mostrarlo, cambiar a true.
+      visible: false,
       specs: [
         { label: "ACABADO", value: "Brillo super transparente" },
         { label: "TOP COATING", value: "Hidrofóbico + autorreparación con calor" },
@@ -224,3 +232,6 @@ export const TECNOLOGIA = {
   footnote:
     "* Vida útil de referencia estimada. El origen de esta estimación no está especificado en la ficha técnica del fabricante y puede variar según uso, mantenimiento, superficie y exposición.",
 } as const;
+
+/** Acabados que se muestran en la web. */
+export const VISIBLE_FINISHES: readonly Finish[] = TECNOLOGIA.finishes.filter((f) => f.visible);

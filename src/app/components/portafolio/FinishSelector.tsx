@@ -39,6 +39,9 @@ export default function FinishSelector({ finishes }: { finishes: readonly Finish
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const reduce = useReducedMotion();
   const finish = finishes[active];
+  // Con un solo acabado visible no hay nada que elegir: se muestra la
+  // misma tarjeta, pero fija y sin el patron de pestañas.
+  const single = finishes.length === 1;
 
   function select(index: number) {
     const next = (index + finishes.length) % finishes.length;
@@ -74,12 +77,35 @@ export default function FinishSelector({ finishes }: { finishes: readonly Finish
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-10">
       <div
-        role="tablist"
-        aria-label="Acabados Corazza"
-        className="grid grid-cols-2 gap-2 rounded-2xl border border-corazza-white/15 p-1.5 lg:col-span-4 lg:grid-cols-1 lg:self-start lg:border-0 lg:p-0"
+        role={single ? undefined : "tablist"}
+        aria-label={single ? undefined : "Acabados Corazza"}
+        className={`${single ? "hidden grid-cols-1 lg:grid" : "grid grid-cols-2"} gap-2 rounded-2xl border border-corazza-white/15 p-1.5 lg:col-span-4 lg:grid-cols-1 lg:self-start lg:border-0 lg:p-0`}
       >
         {finishes.map((item, i) => {
           const selected = i === active;
+          const content = (
+            <span className="relative flex items-center gap-3 sm:gap-4">
+              <FinishSwatch id={item.id} />
+              <span className="flex flex-col">
+                <span className="font-corazza-serif text-lg font-semibold leading-tight tracking-wide sm:text-xl lg:text-2xl">
+                  {item.name}
+                </span>
+                <span className="mt-1 hidden font-corazza-sans text-[10px] font-medium tracking-[0.18em] text-corazza-cream lg:block">
+                  {item.subtitle}
+                </span>
+              </span>
+            </span>
+          );
+          if (single) {
+            return (
+              <div
+                key={item.id}
+                className="relative flex min-h-[56px] items-center gap-3 rounded-xl bg-corazza-white/10 px-3 py-3 text-corazza-white sm:gap-4 sm:px-4 lg:min-h-[88px] lg:rounded-2xl lg:border lg:border-corazza-beige/60 lg:px-5"
+              >
+                {content}
+              </div>
+            );
+          }
           return (
             <button
               key={item.id}
@@ -108,27 +134,17 @@ export default function FinishSelector({ finishes }: { finishes: readonly Finish
                   transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.45, bounce: 0 }}
                 />
               )}
-              <span className="relative flex items-center gap-3 sm:gap-4">
-                <FinishSwatch id={item.id} />
-                <span className="flex flex-col">
-                  <span className="font-corazza-serif text-lg font-semibold leading-tight tracking-wide sm:text-xl lg:text-2xl">
-                    {item.name}
-                  </span>
-                  <span className="mt-1 hidden font-corazza-sans text-[10px] font-medium tracking-[0.18em] text-corazza-cream lg:block">
-                    {item.subtitle}
-                  </span>
-                </span>
-              </span>
+              {content}
             </button>
           );
         })}
       </div>
 
       <div
-        role="tabpanel"
+        role={single ? undefined : "tabpanel"}
         id="acabado-panel"
-        aria-labelledby={`acabado-tab-${finish.id}`}
-        tabIndex={0}
+        aria-labelledby={single ? undefined : `acabado-tab-${finish.id}`}
+        tabIndex={single ? undefined : 0}
         className="grid overflow-hidden rounded-2xl bg-corazza-white text-corazza-charcoal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-corazza-beige sm:grid-cols-5 lg:col-span-8"
       >
         {/* Foto del acabado elegido: cambia con un fundido al cambiar de
