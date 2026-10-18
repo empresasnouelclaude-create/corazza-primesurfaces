@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Panel Corazza</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: barra lateral oscura de la marca + area de trabajo clara; en movil la barra pasa arriba y el menu se desliza en horizontal. */
+:root{
+  --bg:#F6F1E7; --surface:#FFFDF8; --surface-2:#F1EADC; --ink:#3A2B20; --muted:#7E6A52; --line:rgba(58,43,32,.12);
+  --accent:#7E6A52; --accent-soft:#E9DFCC; --side:#3A2B20; --side-ink:#F9F5ED; --side-muted:#CDBFA6;
+  --ok:#4C7A52; --ok-soft:#E3EEDF; --warn:#9C6F22; --warn-soft:#F5E8CC; --crit:#A3463A; --crit-soft:#F6E0DA;
+  --c1:#3A2B20; --c2:#7E6A52; --c3:#B89C82; --c4:#DACFB6;
+  --serif:"Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --sans:"Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1C1511; --surface:#261D17; --surface-2:#30251D; --ink:#F3ECDF; --muted:#BCAA90; --line:rgba(243,236,223,.12);
+  --accent:#DACFB6; --accent-soft:#3A2D23; --side:#140F0C; --side-ink:#F9F5ED; --side-muted:#AE9E86;
+  --ok:#8FC293; --ok-soft:#24332A; --warn:#E2B661; --warn-soft:#3A2F1A; --crit:#E8907F; --crit-soft:#3D231E;
+  --c1:#F3ECDF; --c2:#C9B597; --c3:#9C8366; --c4:#5E4C3D; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1C1511; --surface:#261D17; --surface-2:#30251D; --ink:#F3ECDF; --muted:#BCAA90; --line:rgba(243,236,223,.12);
+  --accent:#DACFB6; --accent-soft:#3A2D23; --side:#140F0C; --side-ink:#F9F5ED; --side-muted:#AE9E86;
+  --ok:#8FC293; --ok-soft:#24332A; --warn:#E2B661; --warn-soft:#3A2F1A; --crit:#E8907F; --crit-soft:#3D231E;
+  --c1:#F3ECDF; --c2:#C9B597; --c3:#9C8366; --c4:#5E4C3D; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100%}
+.side{background:var(--side);color:var(--side-ink);padding:24px 16px;display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;flex-direction:column;gap:2px;padding:0 8px}
+.brand b{font-family:var(--serif);font-size:30px;font-weight:600;letter-spacing:.14em;line-height:1}
+.brand span{font-size:10px;letter-spacing:.24em;color:var(--side-muted);text-transform:uppercase}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav-group{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--side-muted);padding:14px 10px 6px}
+.nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;color:var(--side-muted);font-weight:500;font-size:13px;white-space:nowrap}
+.nav button:hover{color:var(--side-ink);background:rgba(249,245,237,.06)}
+.nav button[aria-current="page"]{color:var(--side-ink);background:rgba(249,245,237,.12)}
+.nav button:focus-visible{outline:2px solid var(--side-muted)}
+.nav svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.badge{margin-left:auto;background:#B89C82;color:#2A1F17;border-radius:99px;font-size:11px;font-weight:700;padding:0 7px}
+.side-foot{margin-top:auto;font-size:11px;color:var(--side-muted);padding:0 8px;line-height:1.6}
+
+.main{min-width:0;padding-block:24px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.demo{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;background:var(--accent-soft);border-radius:12px;padding:10px 14px;font-size:12px;color:var(--muted)}
+.demo strong{color:var(--ink);font-weight:600}
+.head{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+.eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,4vw,40px);line-height:1.05;margin:4px 0 0;text-wrap:balance}
+h2{font-family:var(--serif);font-weight:600;font-size:22px;margin:0;line-height:1.15}
+h3{font-size:13px;font-weight:600;margin:0}
+p{margin:0}
+.sub{color:var(--muted);font-size:13px;max-width:64ch}
+
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 14px;font-weight:600;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.wa{background:#2F6B48;color:#fff;border-color:#2F6B48}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
+.card-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.card-h .link{font-size:12px;color:var(--muted);font-weight:600}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g-main{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi .l{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.04em}
+.kpi .v{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1.1;margin-top:4px}
+.kpi .d{font-size:11px;margin-top:2px;color:var(--muted)}
+.up{color:var(--ok)} .down{color:var(--crit)}
+
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:2px 9px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.ok{background:var(--ok-soft);color:var(--ok)} .warn{background:var(--warn-soft);color:var(--warn)} .crit{background:var(--crit-soft);color:var(--crit)} .neu{background:var(--surface-2);color:var(--muted)}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:11px;color:var(--muted);white-space:nowrap}
+
+.list{display:flex;flex-direction:column}
+.row{display:flex;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0;padding-top:0}
+.row .t{min-width:0;flex:1}
+.row .t b{display:block;font-weight:600;font-size:13px}
+.row .t span{color:var(--muted);font-size:12px}
+.time{font-weight:700;font-size:13px;width:52px;flex:none}
+.stripe{width:4px;align-self:stretch;border-radius:4px;flex:none}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:0 10px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right}
+
+.bar{height:8px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.bar.lo i{background:var(--crit)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+.kanban{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(220px,1fr);gap:12px;overflow-x:auto;padding-bottom:6px}
+.col{background:var(--surface-2);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.col-h{display:flex;justify-content:space-between;font-size:12px;font-weight:700;padding:2px 4px 4px}
+.col-h span{color:var(--muted);font-weight:600}
+.lead{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.lead:hover{border-color:var(--muted)}
+.lead b{font-size:13px}
+.lead .m{font-size:12px;color:var(--muted)}
+.lead .f{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
+
+.kv{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:13px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:500}
+.timeline{display:flex;flex-direction:column;gap:10px;font-size:12px;border-left:2px solid var(--line);padding-left:14px;margin-left:4px}
+.timeline div{position:relative}
+.timeline div::before{content:"";position:absolute;left:-19px;top:5px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.timeline span{color:var(--muted);display:block}
+
+.wa-bubble{background:#DCF3D6;color:#1F2A1C;border-radius:12px 12px 4px 12px;padding:12px 14px;font-size:13px;line-height:1.55;max-width:420px;margin-left:auto;white-space:pre-line}
+.phone{border:1px solid var(--line);border-radius:28px;padding:14px;background:var(--surface-2);max-width:340px;margin:0 auto;width:100%}
+.phone-in{background:var(--surface);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+
+.marble{aspect-ratio:4/3;border-radius:10px;position:relative;overflow:hidden;background:
+  linear-gradient(115deg,transparent 40%,rgba(120,110,100,.35) 42%,transparent 46%),
+  linear-gradient(160deg,transparent 55%,rgba(150,135,120,.3) 57%,transparent 60%),
+  linear-gradient(135deg,#ECE7E0,#D9D1C6)}
+.marble.after{background:
+  linear-gradient(115deg,transparent 40%,rgba(120,110,100,.35) 42%,transparent 46%),
+  linear-gradient(160deg,transparent 55%,rgba(150,135,120,.3) 57%,transparent 60%),
+  linear-gradient(105deg,rgba(255,255,255,0) 30%,rgba(255,255,255,.55) 38%,rgba(255,255,255,0) 46%),
+  linear-gradient(135deg,#F2EEE8,#DDD5CA)}
+.marble span{position:absolute;left:8px;bottom:8px;background:rgba(58,43,32,.78);color:#F9F5ED;font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px}
+.check{display:flex;gap:8px;align-items:center;font-size:13px;padding:5px 0}
+.check i{width:16px;height:16px;border-radius:5px;border:1.5px solid var(--ok);display:grid;place-items:center;flex:none;font-style:normal;font-size:11px;color:var(--ok);font-weight:700}
+
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12px;font-weight:600;color:var(--muted)}
+.field input,.field select{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;font-size:14px;width:100%}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 12px;font-weight:600;font-size:13px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.result{border-radius:12px;padding:14px;display:flex;gap:12px;align-items:center}
+.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;letter-spacing:.08em;font-size:15px}
+.code-big{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;letter-spacing:.12em;font-size:26px}
+
+.flow{display:flex;flex-direction:column;gap:0}
+.step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px}
+.step .dot{width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--ink);display:grid;place-items:center;font-weight:700;font-size:12px}
+.step .ln{grid-column:1;justify-self:center;width:2px;background:var(--line);min-height:14px}
+.step .body{padding-bottom:16px;min-width:0}
+.step .body b{font-size:13px;display:block}
+.step .body span{font-size:12px;color:var(--muted)}
+.msg{margin-top:6px;background:var(--surface-2);border-radius:10px;padding:8px 10px;font-size:12px}
+
+.phase{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;padding:16px 0;border-top:1px solid var(--line)}
+.phase:first-of-type{border-top:0;padding-top:0}
+.phase .n{font-family:var(--serif);font-size:34px;font-weight:600;line-height:1;color:var(--muted);width:36px}
+.phase ul{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:13px}
+
+.view{display:none;flex-direction:column;gap:20px}
+.view.on{display:flex}
+.note{font-size:12px;color:var(--muted)}
+.svg-chart text{fill:var(--muted);font-size:11px;font-family:var(--sans)}
+.svg-chart .grid-l{stroke:var(--line)}
+
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:sticky;top:env(safe-area-inset-top,0px);height:auto;z-index:5;padding:12px 0 8px;gap:8px}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--side)}
+  .brand{flex-direction:row;align-items:baseline;gap:10px;padding:0 max(16px,env(safe-area-inset-left,0px))}
+  .brand b{font-size:24px}
+  .nav{flex-direction:row;overflow-x:auto;gap:4px;padding:0 max(16px,env(safe-area-inset-right,0px)) 2px max(16px,env(safe-area-inset-left,0px));scrollbar-width:none}
+  .nav::-webkit-scrollbar{display:none}
+  .nav-group,.side-foot{display:none}
+  .g-main,.g2,.g3{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:520px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi .v{font-size:26px}}
+@media (prefers-reduced-motion:no-preference){.view.on{animation:fade .25s ease}@keyframes fade{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand"><b>CORAZZA</b><span>Panel de control</span></div>
+    <nav class="nav" aria-label="Secciones del panel">
+      <div class="nav-group">Día a día</div>
+      <button data-view="inicio"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Inicio</button>
+      <button data-view="clientes"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.6.8 2.6 2.5 3 5.2"/></svg>Clientes<span class="badge">4</span></button>
+      <button data-view="cotizaciones"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Cotizaciones</button>
+      <button data-view="agenda"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Agenda</button>
+      <button data-view="trabajos"><svg viewBox="0 0 24 24"><path d="M14.5 6.5l3 3L8 19H5v-3z"/><path d="M13 8l3 3"/></svg>Trabajos</button>
+      <div class="nav-group">Negocio</div>
+      <button data-view="inventario"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6v12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V6"/></svg>Inventario</button>
+      <button data-view="dinero"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>Dinero</button>
+      <button data-view="fidelizacion"><svg viewBox="0 0 24 24"><path d="M4 9V6a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v3a3 3 0 0 0 0 6v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a3 3 0 0 0 0-6z"/><path d="M10 9l4 6"/></svg>Códigos y garantías</button>
+      <div class="nav-group">Crecimiento</div>
+      <button data-view="instagram"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg>Instagram</button>
+      <button data-view="marketing"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Marketing</button>
+      <button data-view="equipo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>Equipo y ajustes</button>
+      <button data-view="fases"><svg viewBox="0 0 24 24"><path d="M4 18l5-5 4 4 7-8"/><path d="M15 9h5v5"/></svg>Fases del proyecto</button>
+    </nav>
+    <div class="side-foot">Propuesta de Bahía para Corazza Prime Surfaces.<br>Maqueta con datos de ejemplo.</div>
+  </aside>
+
+  <main class="main">
+    <div class="wrap">
+      <div class="demo"><span><strong>Maqueta navegable.</strong> Todos los nombres y cifras son ejemplos de cómo se vería un mes de trabajo.</span><span>corazza.com.do/panel</span></div>
+
+      <!-- INICIO -->
+      <section class="view" id="v-inicio" aria-labelledby="t-inicio">
+        <div class="head">
+          <div><div class="eyebrow">Lunes 23 de noviembre</div><h1 id="t-inicio">Buenos días</h1><p class="sub">Esto es lo que necesita tu atención hoy.</p></div>
+          <div class="actions"><button class="btn" data-go="cotizaciones">Nueva cotización</button><button class="btn primary" data-go="clientes">+ Cliente</button></div>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="l">Interesados del mes</div><div class="v num">48</div><div class="d"><span class="up">▲ 12</span> vs. mes pasado</div></div>
+          <div class="kpi"><div class="l">Cotizaciones</div><div class="v num">21</div><div class="d">44% de los interesados</div></div>
+          <div class="kpi"><div class="l">Ventas</div><div class="v num">9</div><div class="d">Cierre 43%</div></div>
+          <div class="kpi"><div class="l">Vendido</div><div class="v num">RD$186k</div><div class="d"><span class="up">▲ 18%</span></div></div>
+          <div class="kpi"><div class="l">Ticket promedio</div><div class="v num">RD$20.7k</div><div class="d">25.9 ft² por trabajo</div></div>
+          <div class="kpi"><div class="l">Responder</div><div class="v num">6 min</div><div class="d">Tiempo promedio</div></div>
+        </div>
+        <div class="grid g-main">
+          <div class="card">
+            <div class="card-h"><h2>Hoy</h2><button class="btn" data-go="agenda">Ver agenda</button></div>
+            <div class="list">
+              <div class="row"><span class="time num">9:00</span><span class="stripe" style="background:var(--c3)"></span><div class="t"><b>Medición · Laura Peña</b><span>Isla de cuarzo · Piantini · Kelvin</span></div><span class="pill neu">Confirmada</span></div>
+              <div class="row"><span class="time num">11:30</span><span class="stripe" style="background:var(--c1)"></span><div class="t"><b>Instalación · Familia Rosario</b><span>Topes de cocina + isla · 38.4 ft² · Kelvin y Ramón</span></div><span class="pill ok">Inicial pagado</span></div>
+              <div class="row"><span class="time num">3:00</span><span class="stripe" style="background:var(--c1)"></span><div class="t"><b>Instalación · Torre Aurora, apto 7B</b><span>Mesa de comedor · 19.7 ft² · Ramón</span></div><span class="pill warn">Falta inicial</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Pendientes</h2></div>
+            <div class="list">
+              <div class="row"><span class="pill crit">4</span><div class="t"><b>Interesados sin responder</b><span>El más antiguo hace 2 h</span></div><button class="btn" data-go="clientes">Ver</button></div>
+              <div class="row"><span class="pill warn">6</span><div class="t"><b>Cotizaciones por seguir</b><span>3 tienen más de 7 días</span></div><button class="btn" data-go="cotizaciones">Ver</button></div>
+              <div class="row"><span class="pill warn">2</span><div class="t"><b>Saldos por cobrar</b><span>RD$31,850 en total</span></div><button class="btn" data-go="dinero">Ver</button></div>
+              <div class="row"><span class="pill crit">!</span><div class="t"><b>Rollo High Gloss 61 cm</b><span>Quedan 54 ft² (13%). Toca pedir.</span></div><button class="btn" data-go="inventario">Ver</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-h"><h2>Interesados por semana</h2><span class="note">Por canal de origen</span></div>
+            <svg class="svg-chart" viewBox="0 0 420 200" width="100%" role="img" aria-label="Interesados por semana: semana 1, 9; semana 2, 11; semana 3, 12; semana 4, 16">
+              <line class="grid-l" x1="36" x2="410" y1="20" y2="20"/><line class="grid-l" x1="36" x2="410" y1="70" y2="70"/><line class="grid-l" x1="36" x2="410" y1="120" y2="120"/><line class="grid-l" x1="36" x2="410" y1="170" y2="170"/>
+              <text x="26" y="24" text-anchor="end">15</text><text x="26" y="74" text-anchor="end">10</text><text x="26" y="124" text-anchor="end">5</text><text x="26" y="174" text-anchor="end">0</text>
+              <!-- escala: 10 px por interesado; base y=170 -->
+              <g><rect x="62" y="125" width="48" height="45" fill="var(--c1)"/><rect x="62" y="105" width="48" height="20" fill="var(--c2)"/><rect x="62" y="95" width="48" height="10" fill="var(--c3)"/><rect x="62" y="80" width="48" height="15" fill="var(--c4)"/></g>
+              <g><rect x="152" y="115" width="48" height="55" fill="var(--c1)"/><rect x="152" y="90" width="48" height="25" fill="var(--c2)"/><rect x="152" y="75" width="48" height="15" fill="var(--c3)"/><rect x="152" y="60" width="48" height="15" fill="var(--c4)"/></g>
+              <g><rect x="242" y="110" width="48" height="60" fill="var(--c1)"/><rect x="242" y="85" width="48" height="25" fill="var(--c2)"/><rect x="242" y="70" width="48" height="15" fill="var(--c3)"/><rect x="242" y="50" width="48" height="20" fill="var(--c4)"/></g>
+              <g><rect x="332" y="90" width="48" height="80" fill="var(--c1)"/><rect x="332" y="60" width="48" height="30" fill="var(--c2)"/><rect x="332" y="45" width="48" height="15" fill="var(--c3)"/><rect x="332" y="10" width="48" height="35" fill="var(--c4)"/></g>
+              <text x="86" y="190" text-anchor="middle">Sem 1</text><text x="176" y="190" text-anchor="middle">Sem 2</text><text x="266" y="190" text-anchor="middle">Sem 3</text><text x="356" y="190" text-anchor="middle">Sem 4</text>
+            </svg>
+            <div class="legend"><span><i style="background:var(--c1)"></i>Anuncios Meta</span><span><i style="background:var(--c2)"></i>Instagram orgánico</span><span><i style="background:var(--c3)"></i>Google</span><span><i style="background:var(--c4)"></i>Referidos</span></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Embudo del mes</h2><span class="note">De interesado a venta</span></div>
+            <div class="list">
+              <div class="row"><div class="t"><b>Interesados</b><div class="bar"><i style="width:100%"></i></div></div><span class="num">48</span></div>
+              <div class="row"><div class="t"><b>Con medidas</b><div class="bar"><i style="width:69%"></i></div></div><span class="num">33</span></div>
+              <div class="row"><div class="t"><b>Cotizados</b><div class="bar"><i style="width:44%"></i></div></div><span class="num">21</span></div>
+              <div class="row"><div class="t"><b>Agendados</b><div class="bar"><i style="width:23%"></i></div></div><span class="num">11</span></div>
+              <div class="row"><div class="t"><b>Vendidos</b><div class="bar"><i style="width:19%"></i></div></div><span class="num">9</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CLIENTES -->
+      <section class="view" id="v-clientes" aria-labelledby="t-clientes">
+        <div class="head">
+          <div><div class="eyebrow">CRM</div><h1 id="t-clientes">Clientes</h1><p class="sub">Cada interesado entra solo desde Instagram, la web o los anuncios, con su origen y sus datos. Se mueve por etapas hasta la postventa.</p></div>
+          <div class="actions"><button class="btn">Filtrar</button><button class="btn primary">+ Cliente</button></div>
+        </div>
+        <div class="kanban">
+          <div class="col"><div class="col-h">Nuevo <span>4</span></div>
+            <div class="lead"><b>Patricia Gómez</b><span class="m">Cocina · Mármol · Naco</span><div class="f"><span class="chip">IG · "PRECIO"</span><span class="pill crit">hace 2 h</span></div></div>
+            <div class="lead"><b>José Almonte</b><span class="m">Mesa de comedor · Madera</span><div class="f"><span class="chip">Anuncio · Video isla</span><span class="pill warn">hace 40 min</span></div></div>
+            <div class="lead"><b>Carolina Méndez</b><span class="m">Baño · Cuarzo · Bella Vista</span><div class="f"><span class="chip">Google</span><span class="pill neu">hace 15 min</span></div></div>
+          </div>
+          <div class="col"><div class="col-h">Con medidas <span>5</span></div>
+            <div class="lead" data-go="ficha"><b>María Fernández</b><span class="m">Isla + topes · Cuarzo · Evaristo Morales</span><div class="f"><span class="chip">IG · "MEDIDAS"</span><span class="pill neu">Lista para cotizar</span></div></div>
+            <div class="lead"><b>Luis Batista</b><span class="m">Topes · Granito · Santiago</span><div class="f"><span class="chip">Referido · Ana P.</span><span class="pill neu">Fotos recibidas</span></div></div>
+          </div>
+          <div class="col"><div class="col-h">Cotizado <span>6</span></div>
+            <div class="lead"><b>Roberto Castillo</b><span class="m">COT-0019 · RD$24,180</span><div class="f"><span class="chip">Anuncio · Café</span><span class="pill warn">Seguir hoy</span></div></div>
+            <div class="lead"><b>Altagracia Núñez</b><span class="m">COT-0017 · RD$15,758</span><div class="f"><span class="chip">IG orgánico</span><span class="pill crit">9 días</span></div></div>
+          </div>
+          <div class="col"><div class="col-h">Agendado <span>3</span></div>
+            <div class="lead"><b>Familia Rosario</b><span class="m">Instalación · Hoy 11:30</span><div class="f"><span class="chip">Anuncio · Isla</span><span class="pill ok">Inicial pagado</span></div></div>
+            <div class="lead"><b>Torre Aurora 7B</b><span class="m">Instalación · Hoy 3:00</span><div class="f"><span class="chip">Google</span><span class="pill warn">Falta inicial</span></div></div>
+          </div>
+          <div class="col"><div class="col-h">Instalado <span>9</span></div>
+            <div class="lead"><b>Ana Pérez</b><span class="m">Garantía registrada · 5 años</span><div class="f"><span class="chip">Anuncio · Café</span><span class="pill ok">Reseña ★★★★★</span></div></div>
+            <div class="lead"><b>Héctor Valdez</b><span class="m">Instalado hace 5 días</span><div class="f"><span class="chip">Referido</span><span class="pill neu">Pedir reseña</span></div></div>
+          </div>
+        </div>
+        <div class="grid g-main" id="ficha">
+          <div class="card">
+            <div class="card-h"><div><div class="eyebrow">Ficha del cliente</div><h2>María Fernández</h2></div><div class="actions"><button class="btn wa">WhatsApp</button><button class="btn primary" data-go="cotizaciones">Cotizar</button></div></div>
+            <dl class="kv">
+              <dt>Teléfono</dt><dd class="num">809-555-0142</dd>
+              <dt>Qué quiere proteger</dt><dd>Isla y topes de cocina</dd>
+              <dt>Material</dt><dd>Cuarzo blanco</dd>
+              <dt>Medidas</dt><dd>Isla 240 × 90 cm · Tope en L (3 uniones)</dd>
+              <dt>Zona</dt><dd>Evaristo Morales, Santo Domingo</dd>
+              <dt>Lo necesita</dt><dd>Este mes</dd>
+              <dt>Cómo nos encontró</dt><dd>Comentó "MEDIDAS" en el reel "La prueba del café"</dd>
+              <dt>Vendedor</dt><dd>Carla</dd>
+            </dl>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Historial</h2></div>
+            <div class="timeline">
+              <div><b>Comentó "MEDIDAS" en Instagram</b><span>Sáb 21 · 8:12 p. m. · DM automático enviado</span></div>
+              <div><b>Completó sus datos en el DM</b><span>Sáb 21 · 8:16 p. m. · Envió 2 fotos</span></div>
+              <div><b>Pasó a WhatsApp</b><span>Sáb 21 · 8:17 p. m.</span></div>
+              <div><b>Carla respondió</b><span>Dom 22 · 9:03 a. m.</span></div>
+              <div><b>Siguiente paso: enviar cotización</b><span>Recordatorio hoy 10:00 a. m.</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COTIZACIONES -->
+      <section class="view" id="v-cotizaciones" aria-labelledby="t-cotizaciones">
+        <div class="head">
+          <div><div class="eyebrow">Ventas</div><h1 id="t-cotizaciones">Cotizaciones</h1><p class="sub">La calculadora de Corazza, dentro del panel. Cada cotización queda guardada, numerada y ligada al cliente, con seguimiento automático si no se cierra.</p></div>
+          <div class="actions"><button class="btn primary">Nueva cotización</button></div>
+        </div>
+        <div class="kpis" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+          <div class="kpi"><div class="l">Abiertas</div><div class="v num">6</div><div class="d">RD$112,340</div></div>
+          <div class="kpi"><div class="l">Ganadas</div><div class="v num">9</div><div class="d">RD$186,400</div></div>
+          <div class="kpi"><div class="l">Perdidas</div><div class="v num">6</div><div class="d">Motivo principal: precio</div></div>
+          <div class="kpi"><div class="l">Tiempo para cotizar</div><div class="v num">14 min</div><div class="d">Desde que llegan las medidas</div></div>
+        </div>
+        <div class="grid g-main">
+          <div class="card">
+            <div class="card-h"><h2>Este mes</h2><span class="note">Seguimiento automático a los 2 y 7 días</span></div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>N.º</th><th>Cliente</th><th class="r">ft²</th><th class="r">Total</th><th>Estado</th><th>Seguimiento</th></tr></thead>
+              <tbody class="num">
+                <tr><td>COT-0021</td><td>María Fernández</td><td class="r">31.4</td><td class="r">RD$25,120</td><td><span class="pill neu">Borrador</span></td><td>—</td></tr>
+                <tr><td>COT-0020</td><td>Familia Rosario</td><td class="r">38.4</td><td class="r">RD$27,648</td><td><span class="pill ok">Ganada</span></td><td>—</td></tr>
+                <tr><td>COT-0019</td><td>Roberto Castillo</td><td class="r">30.2</td><td class="r">RD$24,180</td><td><span class="pill warn">Abierta</span></td><td>Hoy (día 2)</td></tr>
+                <tr><td>COT-0018</td><td>Torre Aurora 7B</td><td class="r">19.7</td><td class="r">RD$15,758</td><td><span class="pill ok">Ganada</span></td><td>—</td></tr>
+                <tr><td>COT-0017</td><td>Altagracia Núñez</td><td class="r">19.7</td><td class="r">RD$15,758</td><td><span class="pill crit">Sin respuesta</span></td><td>Día 9 · llamar</td></tr>
+                <tr><td>COT-0016</td><td>Daniel Ortiz</td><td class="r">12.1</td><td class="r">RD$9,680</td><td><span class="pill neu">Perdida · precio</span></td><td>—</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><div><div class="eyebrow">COT-0021 · María Fernández</div><h2>Vista previa</h2></div></div>
+            <div class="table-wrap"><table class="num">
+              <tbody>
+                <tr><td>Isla · 240 × 90 cm</td><td class="r">23.25 ft²</td></tr>
+                <tr><td>Tope en L · 3 tramos</td><td class="r">8.15 ft²</td></tr>
+                <tr><td><b>Área total</b></td><td class="r"><b>31.40 ft²</b></td></tr>
+                <tr><td>Film recomendado (+10%)</td><td class="r">34.54 ft²</td></tr>
+                <tr><td>Precio por ft²</td><td class="r">RD$800</td></tr>
+                <tr><td>Código CZ10-7KQ4 (−10%)</td><td class="r">−RD$2,512</td></tr>
+                <tr><td><b>Total</b></td><td class="r"><b>RD$22,608</b></td></tr>
+              </tbody>
+            </table></div>
+            <p class="note" style="margin:12px 0 8px">Así le llega por WhatsApp:</p>
+            <div class="wa-bubble">Hola María, gracias por elegir Corazza ✨
+Tu cotización COT-0021:
+• Isla 240 × 90 cm · 23.25 ft²
+• Tope en L · 8.15 ft²
+Total con tu 10% de bienvenida: RD$22,608
+Garantía de 5 años. ¿Te agendamos la instalación?</div>
+            <div class="actions" style="margin-top:12px"><button class="btn wa">Enviar por WhatsApp</button><button class="btn">PDF con logo</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AGENDA -->
+      <section class="view" id="v-agenda" aria-labelledby="t-agenda">
+        <div class="head">
+          <div><div class="eyebrow">Operación</div><h1 id="t-agenda">Agenda</h1><p class="sub">Visitas de medición e instalaciones por instalador. El cliente recibe la confirmación y un recordatorio el día antes.</p></div>
+          <div class="actions"><button class="btn">Semana</button><button class="btn primary">+ Agendar</button></div>
+        </div>
+        <div class="grid g-main">
+          <div class="card">
+            <div class="card-h"><h2>Semana del 23 al 28 de noviembre</h2><div class="legend"><span><i style="background:var(--c3)"></i>Medición</span><span><i style="background:var(--c1)"></i>Instalación</span></div></div>
+            <div class="list">
+              <div class="row"><span class="time">Lun</span><span class="stripe" style="background:var(--c3)"></span><div class="t"><b>9:00 · Medición · Laura Peña</b><span>Piantini · Kelvin</span></div><span class="pill ok">Recordatorio enviado</span></div>
+              <div class="row"><span class="time">Lun</span><span class="stripe" style="background:var(--c1)"></span><div class="t"><b>11:30 · Instalación · Familia Rosario</b><span>Los Prados · Kelvin y Ramón · 38.4 ft²</span></div><span class="pill ok">Confirmada</span></div>
+              <div class="row"><span class="time">Lun</span><span class="stripe" style="background:var(--c1)"></span><div class="t"><b>3:00 · Instalación · Torre Aurora 7B</b><span>Naco · Ramón · 19.7 ft²</span></div><span class="pill warn">Falta inicial</span></div>
+              <div class="row"><span class="time">Mar</span><span class="stripe" style="background:var(--c3)"></span><div class="t"><b>10:00 · Medición · María Fernández</b><span>Evaristo Morales · Kelvin</span></div><span class="pill neu">Por confirmar</span></div>
+              <div class="row"><span class="time">Mié</span><span class="stripe" style="background:var(--c1)"></span><div class="t"><b>9:30 · Instalación · Luis Batista</b><span>Santiago · Kelvin y Ramón · 27.0 ft²</span></div><span class="pill ok">Confirmada</span></div>
+              <div class="row"><span class="time">Jue</span><span class="stripe" style="background:var(--c3)"></span><div class="t"><b>4:00 · Medición · Constructora Arenas</b><span>Proyecto Mirador · 12 apartamentos</span></div><span class="pill neu">B2B</span></div>
+            </div>
+          </div>
+          <div>
+            <p class="note" style="margin-bottom:8px;text-align:center">Lo que ve el instalador en su celular</p>
+            <div class="phone"><div class="phone-in">
+              <div class="eyebrow">Hoy · Ramón</div>
+              <h2>2 trabajos</h2>
+              <div class="card" style="padding:12px"><h3>11:30 · Familia Rosario</h3><p class="note">Calle 5 #12, Los Prados · 38.4 ft²</p><div class="actions" style="margin-top:8px"><button class="btn">Mapa</button><button class="btn" data-go="trabajos">Abrir ficha</button></div></div>
+              <div class="card" style="padding:12px"><h3>3:00 · Torre Aurora 7B</h3><p class="note">Av. Gustavo Mejía Ricart · 19.7 ft²</p><div class="actions" style="margin-top:8px"><button class="btn">Mapa</button><button class="btn" data-go="trabajos">Abrir ficha</button></div></div>
+            </div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRABAJOS -->
+      <section class="view" id="v-trabajos" aria-labelledby="t-trabajos">
+        <div class="head">
+          <div><div class="eyebrow">Operación</div><h1 id="t-trabajos">Trabajos</h1><p class="sub">La ficha de cada instalación: medidas, film usado, fotos de antes y después y confirmación del cliente. Al cerrarla se registra la garantía y empieza la postventa.</p></div>
+        </div>
+        <div class="grid g-main">
+          <div class="card">
+            <div class="card-h"><div><div class="eyebrow">TR-0009 · Instalado hoy</div><h2>Familia Rosario · Topes + isla</h2></div><span class="pill ok">Completado</span></div>
+            <div class="grid g2">
+              <div class="marble"><span>Antes</span></div>
+              <div class="marble after"><span>Después · High Gloss</span></div>
+            </div>
+            <div class="grid g3" style="margin-top:16px">
+              <div><div class="note">Área instalada</div><div class="num" style="font-weight:700;font-size:18px">38.4 ft²</div></div>
+              <div><div class="note">Film estimado / usado</div><div class="num" style="font-weight:700;font-size:18px">42.2 / 44.0 ft²</div></div>
+              <div><div class="note">Desperdicio</div><div class="num" style="font-weight:700;font-size:18px">14.6%</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Cierre del trabajo</h2></div>
+            <div class="check"><i>✓</i>Superficie limpia antes de instalar</div>
+            <div class="check"><i>✓</i>Fotos de antes y después subidas</div>
+            <div class="check"><i>✓</i>Kit de cuidado entregado (QR)</div>
+            <div class="check"><i>✓</i>Cliente confirmó conforme</div>
+            <div class="check"><i>✓</i>Garantía registrada hasta 23/11/2031</div>
+            <p class="note" style="margin-top:10px">Automático al cerrar: mensaje de cuidados hoy, pedido de reseña en 7 días y código de 5% para la segunda compra en 3 meses. Las fotos quedan disponibles para la agencia.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- INVENTARIO -->
+      <section class="view" id="v-inventario" aria-labelledby="t-inventario">
+        <div class="head">
+          <div><div class="eyebrow">Negocio</div><h1 id="t-inventario">Inventario de film</h1><p class="sub">Cada trabajo descuenta el film usado. Cuando un rollo baja del 20% llega una alerta para pedir.</p></div>
+          <div class="actions"><button class="btn primary">Registrar entrada</button></div>
+        </div>
+        <div class="grid g-main">
+          <div class="card">
+            <div class="card-h"><h2>Rollos en existencia</h2></div>
+            <div class="table-wrap"><table class="num">
+              <thead><tr><th>Rollo</th><th>Ancho</th><th class="r">Quedan</th><th style="min-width:140px">Nivel</th><th>Estado</th></tr></thead>
+              <tbody>
+                <tr><td>High Gloss #HG-07</td><td>61 cm</td><td class="r">54 ft²</td><td><div class="bar lo"><i style="width:13%"></i></div></td><td><span class="pill crit">Pedir</span></td></tr>
+                <tr><td>High Gloss #HG-08</td><td>122 cm</td><td class="r">286 ft²</td><td><div class="bar"><i style="width:72%"></i></div></td><td><span class="pill ok">Bien</span></td></tr>
+                <tr><td>High Gloss #HG-09</td><td>152 cm</td><td class="r">410 ft²</td><td><div class="bar"><i style="width:100%"></i></div></td><td><span class="pill ok">Nuevo</span></td></tr>
+              </tbody>
+            </table></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Desperdicio</h2><span class="note">Estimado vs. usado</span></div>
+            <div class="list">
+              <div class="row"><div class="t"><b>Promedio del mes</b><span>Meta: menos de 12%</span></div><span class="pill warn num">13.1%</span></div>
+              <div class="row"><div class="t"><b>Kelvin</b><span>5 trabajos</span></div><span class="num">10.8%</span></div>
+              <div class="row"><div class="t"><b>Ramón</b><span>4 trabajos</span></div><span class="num">15.9%</span></div>
+              <div class="row"><div class="t"><b>Tope en L / en U</b><span>Las uniones gastan más</span></div><span class="num">17.2%</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DINERO -->
+      <section class="view" id="v-dinero" aria-labelledby="t-dinero">
+        <div class="head">
+          <div><div class="eyebrow">Negocio</div><h1 id="t-dinero">Dinero</h1><p class="sub">Ventas, cobros y margen real de cada trabajo: film más instalación.</p></div>
+        </div>
+        <div class="kpis" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+          <div class="kpi"><div class="l">Vendido</div><div class="v num">RD$186,400</div><div class="d">9 trabajos</div></div>
+          <div class="kpi"><div class="l">Cobrado</div><div class="v num">RD$154,550</div><div class="d">83%</div></div>
+          <div class="kpi"><div class="l">Por cobrar</div><div class="v num">RD$31,850</div><div class="d">2 clientes</div></div>
+          <div class="kpi"><div class="l">Margen promedio</div><div class="v num">58%</div><div class="d">Después de film e instalación</div></div>
+        </div>
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-h"><h2>Por cobrar</h2></div>
+            <div class="list">
+              <div class="row"><div class="t"><b>Torre Aurora 7B</b><span>Instalación hoy · falta el inicial</span></div><span class="num">RD$15,758</span><button class="btn wa">Recordar</button></div>
+              <div class="row"><div class="t"><b>Familia Rosario</b><span>Saldo al terminar · hoy</span></div><span class="num">RD$16,092</span><button class="btn wa">Recordar</button></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Margen por trabajo</h2></div>
+            <div class="table-wrap"><table class="num">
+              <thead><tr><th>Trabajo</th><th class="r">Venta</th><th class="r">Costo</th><th class="r">Margen</th></tr></thead>
+              <tbody>
+                <tr><td>Familia Rosario</td><td class="r">RD$27,648</td><td class="r">RD$11,980</td><td class="r">57%</td></tr>
+                <tr><td>Ana Pérez</td><td class="r">RD$14,182</td><td class="r">RD$5,310</td><td class="r">63%</td></tr>
+                <tr><td>Héctor Valdez</td><td class="r">RD$21,600</td><td class="r">RD$9,940</td><td class="r">54%</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FIDELIZACION -->
+      <section class="view" id="v-fidelizacion" aria-labelledby="t-fidelizacion">
+        <div class="head">
+          <div><div class="eyebrow">Recompra</div><h1 id="t-fidelizacion">Códigos y garantías</h1><p class="sub">10% en la primera compra y 5% en la segunda. Cada código es único, queda ligado al cliente y solo se puede usar una vez.</p></div>
+        </div>
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-h"><h2>Validar un código</h2></div>
+            <form class="field" id="val-form">
+              <label for="val-code">Código del cliente</label>
+              <div style="display:flex;gap:8px"><input id="val-code" value="CZ10-7KQ4" autocomplete="off" spellcheck="false"><button class="btn primary" type="submit">Validar</button></div>
+            </form>
+            <div id="val-out" class="result ok" style="margin-top:12px" aria-live="polite"></div>
+            <p class="note" style="margin-top:10px">Prueba con CZ10-7KQ4, CZ05-M3TA o CZ10-XXXX.</p>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Generar código</h2></div>
+            <div class="field"><label for="gen-client">Cliente</label><input id="gen-client" value="María Fernández"></div>
+            <div class="field" style="margin-top:12px"><label>Tipo</label><div class="seg" id="gen-type"><button type="button" aria-pressed="true" data-p="10">Primera compra · 10%</button><button type="button" aria-pressed="false" data-p="5">Segunda compra · 5%</button></div></div>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px"><button class="btn primary" id="gen-btn" type="button">Generar</button><span class="code-big" id="gen-out">CZ10-7KQ4</span></div>
+            <p class="note" style="margin-top:10px">Listo para copiar y mandar por WhatsApp.</p>
+          </div>
+        </div>
+        <div class="grid g-main">
+          <div class="card">
+            <div class="card-h"><h2>Códigos recientes</h2></div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Código</th><th>Cliente</th><th>Tipo</th><th>Estado</th><th>Fecha</th></tr></thead>
+              <tbody class="num">
+                <tr><td class="code">CZ10-7KQ4</td><td>María Fernández</td><td>10%</td><td><span class="pill ok">Activo</span></td><td>21/11</td></tr>
+                <tr><td class="code">CZ05-M3TA</td><td>Ana Pérez</td><td>5%</td><td><span class="pill neu">Usado</span></td><td>18/11</td></tr>
+                <tr><td class="code">CZ10-R8WD</td><td>Familia Rosario</td><td>10%</td><td><span class="pill neu">Usado</span></td><td>14/11</td></tr>
+                <tr><td class="code">REF-ANAP</td><td>Ana Pérez (referidos)</td><td>Referido</td><td><span class="pill ok">2 usos</span></td><td>—</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Garantías</h2></div>
+            <div class="list">
+              <div class="row"><div class="t"><b>Registradas por QR</b><span>Del kit de cuidado</span></div><span class="num" style="font-weight:700">7 de 9</span></div>
+              <div class="row"><div class="t"><b>Reseñas en Google</b><span>Promedio 4.9</span></div><span class="num" style="font-weight:700">6</span></div>
+              <div class="row"><div class="t"><b>Reclamos abiertos</b><span>Ninguno</span></div><span class="pill ok">0</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INSTAGRAM -->
+      <section class="view" id="v-instagram" aria-labelledby="t-instagram">
+        <div class="head">
+          <div><div class="eyebrow">Captación automática</div><h1 id="t-instagram">Instagram</h1><p class="sub">Comentarios y DMs con respuesta al instante. Cada persona que completa sus datos entra sola a Clientes.</p></div>
+          <div class="actions"><button class="btn primary">+ Palabra clave</button></div>
+        </div>
+        <div class="kpis" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+          <div class="kpi"><div class="l">Comentarios con palabra clave</div><div class="v num">312</div><div class="d">Este mes</div></div>
+          <div class="kpi"><div class="l">DMs automáticos</div><div class="v num">298</div><div class="d">Respuesta en menos de 1 min</div></div>
+          <div class="kpi"><div class="l">Completaron sus datos</div><div class="v num">141</div><div class="d">47%</div></div>
+          <div class="kpi"><div class="l">Pasaron a WhatsApp</div><div class="v num">96</div><div class="d">Con medidas incluidas</div></div>
+        </div>
+        <div class="grid g-main">
+          <div class="card">
+            <div class="card-h"><h2>Flujo "PRECIO"</h2><span class="pill ok">Activo</span></div>
+            <div class="flow">
+              <div class="step"><span class="dot">1</span><div class="body"><b>Alguien comenta "PRECIO" en un reel o anuncio</b><span>También funciona si responde una historia</span></div></div>
+              <div class="step"><span class="dot">2</span><div class="body"><b>Respuesta pública en el comentario</b><div class="msg">¡Te escribimos por DM! ✨</div></div></div>
+              <div class="step"><span class="dot">3</span><div class="body"><b>DM al instante</b><div class="msg">Hola 👋 Para cotizar tu superficie necesitamos 3 datos. ¿Qué quieres proteger?<br>[Cocina] [Isla] [Mesa] [Baño] [Otro]</div></div></div>
+              <div class="step"><span class="dot">4</span><div class="body"><b>Material, medidas o foto, zona y para cuándo</b><span>Con el enlace a la guía "¿Cómo medir mi tope?"</span></div></div>
+              <div class="step"><span class="dot">5</span><div class="body"><b>Se guarda en Clientes y se avisa al vendedor de turno</b><span>Con el origen: palabra clave y publicación</span></div></div>
+              <div class="step"><span class="dot">6</span><div class="body"><b>Botón "Seguir por WhatsApp"</b><div class="msg">Hola Corazza, soy Patricia. Quiero proteger mi cocina de mármol, 3.2 × 0.6 m, en Naco.</div></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Palabras clave</h2></div>
+            <div class="table-wrap"><table class="num">
+              <thead><tr><th>Palabra</th><th class="r">Comentarios</th><th class="r">Datos</th><th class="r">Ventas</th></tr></thead>
+              <tbody>
+                <tr><td><b>PRECIO</b></td><td class="r">168</td><td class="r">74</td><td class="r">4</td></tr>
+                <tr><td><b>MEDIDAS</b></td><td class="r">71</td><td class="r">42</td><td class="r">3</td></tr>
+                <tr><td><b>INFO</b></td><td class="r">52</td><td class="r">18</td><td class="r">1</td></tr>
+                <tr><td><b>GUÍA</b></td><td class="r">21</td><td class="r">7</td><td class="r">0</td></tr>
+              </tbody>
+            </table></div>
+            <h3 style="margin-top:18px">Menú del DM de bienvenida</h3>
+            <div class="actions" style="margin-top:8px"><span class="chip">Cotizar</span><span class="chip">Ver trabajos</span><span class="chip">Cómo medir</span><span class="chip">Garantía y cuidados</span><span class="chip">Hablar con alguien</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MARKETING -->
+      <section class="view" id="v-marketing" aria-labelledby="t-marketing">
+        <div class="head">
+          <div><div class="eyebrow">Crecimiento</div><h1 id="t-marketing">Marketing</h1><p class="sub">De dónde viene cada venta. Es el informe que se le pasa a la agencia cada mes para que invierta donde funciona.</p></div>
+          <div class="actions"><button class="btn">Noviembre</button><button class="btn primary">Informe para la agencia</button></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Resultados por canal</h2><span class="note">Pauta del mes: RD$18,000</span></div>
+          <div class="table-wrap"><table class="num">
+            <thead><tr><th>Canal</th><th class="r">Interesados</th><th class="r">Cotizados</th><th class="r">Ventas</th><th class="r">Vendido</th><th class="r">Costo por interesado</th><th class="r">Costo por venta</th></tr></thead>
+            <tbody>
+              <tr><td>Anuncio · "La prueba del café"</td><td class="r">14</td><td class="r">7</td><td class="r">3</td><td class="r">RD$58,420</td><td class="r">RD$714</td><td class="r">RD$3,333</td></tr>
+              <tr><td>Anuncio · "Isla antes y después"</td><td class="r">11</td><td class="r">4</td><td class="r">2</td><td class="r">RD$43,406</td><td class="r">RD$727</td><td class="r">RD$4,000</td></tr>
+              <tr><td>Instagram orgánico</td><td class="r">11</td><td class="r">5</td><td class="r">2</td><td class="r">RD$37,358</td><td class="r">—</td><td class="r">—</td></tr>
+              <tr><td>Google</td><td class="r">6</td><td class="r">3</td><td class="r">1</td><td class="r">RD$15,758</td><td class="r">—</td><td class="r">—</td></tr>
+              <tr><td>Referidos</td><td class="r">6</td><td class="r">2</td><td class="r">1</td><td class="r">RD$31,458</td><td class="r">—</td><td class="r">—</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-h"><h2>Por qué se pierden ventas</h2></div>
+            <div class="list">
+              <div class="row"><div class="t"><b>Precio</b><div class="bar"><i style="width:50%"></i></div></div><span class="num">3</span></div>
+              <div class="row"><div class="t"><b>No respondió</b><div class="bar"><i style="width:33%"></i></div></div><span class="num">2</span></div>
+              <div class="row"><div class="t"><b>Lo dejó para después</b><div class="bar"><i style="width:17%"></i></div></div><span class="num">1</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Lo que dice el informe</h2></div>
+            <div class="list">
+              <div class="row"><span class="pill ok">Subir</span><div class="t"><b>"La prueba del café"</b><span>Menor costo por venta. Pasarle más presupuesto.</span></div></div>
+              <div class="row"><span class="pill warn">Revisar</span><div class="t"><b>Palabra "INFO"</b><span>Mucho comentario, pocos datos. Cambiar el primer mensaje.</span></div></div>
+              <div class="row"><span class="pill neu">Probar</span><div class="t"><b>Campaña para constructoras</b><span>Hay 9 instalaciones con fotos para mostrar.</span></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EQUIPO -->
+      <section class="view" id="v-equipo" aria-labelledby="t-equipo">
+        <div class="head">
+          <div><div class="eyebrow">Configuración</div><h1 id="t-equipo">Equipo y ajustes</h1><p class="sub">Cada persona ve solo lo que necesita. Todo queda registrado: quién creó, cambió o canjeó cada cosa.</p></div>
+          <div class="actions"><button class="btn primary">+ Usuario</button></div>
+        </div>
+        <div class="grid g2">
+          <div class="card">
+            <div class="card-h"><h2>Usuarios</h2></div>
+            <div class="list">
+              <div class="row"><div class="t"><b>Dueños (2)</b><span>Ven y controlan todo</span></div><span class="pill ok">Todo</span></div>
+              <div class="row"><div class="t"><b>Carla · Ventas</b><span>Clientes, cotizaciones y códigos</span></div><span class="pill neu">Ventas</span></div>
+              <div class="row"><div class="t"><b>Kelvin · Instalador</b><span>Su agenda y sus trabajos</span></div><span class="pill neu">Instalación</span></div>
+              <div class="row"><div class="t"><b>Ramón · Instalador</b><span>Su agenda y sus trabajos</span></div><span class="pill neu">Instalación</span></div>
+              <div class="row"><div class="t"><b>Agencia</b><span>Solo el informe de Marketing y las fotos</span></div><span class="pill neu">Lectura</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Ajustes del negocio</h2></div>
+            <dl class="kv">
+              <dt>Precio por ft²</dt><dd class="num">RD$800</dd>
+              <dt>Margen de film</dt><dd class="num">10%</dd>
+              <dt>Seguimiento</dt><dd>Días 2 y 7</dd>
+              <dt>Alerta de rollo</dt><dd>Menos de 20%</dd>
+              <dt>Códigos</dt><dd>10% primera · 5% segunda · un solo uso</dd>
+              <dt>Garantía</dt><dd>5 años desde la instalación</dd>
+            </dl>
+            <h3 style="margin-top:18px">Actividad reciente</h3>
+            <div class="timeline" style="margin-top:8px">
+              <div><b>Carla canjeó CZ05-M3TA</b><span>Hoy 9:41 a. m.</span></div>
+              <div><b>Ramón cerró TR-0008 con 6 fotos</b><span>Ayer 5:12 p. m.</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FASES -->
+      <section class="view" id="v-fases" aria-labelledby="t-fases">
+        <div class="head">
+          <div><div class="eyebrow">Propuesta de Bahía</div><h1 id="t-fases">Fases del proyecto</h1><p class="sub">El panel se construye por partes dentro de corazza.com.do, para usarlo desde el lanzamiento y sumar lo demás con las primeras ventas.</p></div>
+        </div>
+        <div class="grid g-main">
+          <div class="card">
+            <div class="phase"><span class="n">1</span><div><h2>Lanzamiento</h2><ul><li>Usuarios y permisos</li><li>Clientes con etapas y origen</li><li>Cotizaciones guardadas: la calculadora dentro del panel</li><li>Formulario de medidas en la web y Pixel de Meta</li><li>Inicio con los números del día</li></ul></div></div>
+            <div class="phase"><span class="n">2</span><div><h2>Operación</h2><ul><li>Agenda con recordatorios al cliente</li><li>Fichas de trabajo con fotos</li><li>Inventario de rollos y desperdicio</li><li>Dinero: cobros, saldos y margen</li></ul></div></div>
+            <div class="phase"><span class="n">3</span><div><h2>Crecimiento</h2><ul><li>Instagram: comentario a DM y captura de datos</li><li>Códigos de 10% y 5%, y referidos</li><li>QR del kit: garantía y reseña en Google</li><li>Mensajes automáticos de postventa</li></ul></div></div>
+            <div class="phase"><span class="n">4</span><div><h2>Inteligencia</h2><ul><li>Resultados por canal y por anuncio</li><li>Ventas cerradas devueltas a Meta para mejorar los anuncios</li><li>Informe mensual para los dueños y la agencia</li></ul></div></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h2>Cómo funciona por dentro</h2></div>
+            <dl class="kv">
+              <dt>Dónde</dt><dd>corazza.com.do/panel, privado con usuario y contraseña</dd>
+              <dt>Celular</dt><dd>Se instala como app desde el navegador</dd>
+              <dt>Datos</dt><dd>Base de datos propia de Corazza</dd>
+              <dt>Instagram</dt><dd>ManyChat conectado a la cuenta de Corazza</dd>
+              <dt>Anuncios</dt><dd>Pixel y API de Conversiones de Meta</dd>
+              <dt>WhatsApp</dt><dd>Mensajes listos con un toque</dd>
+              <dt>Fotos</dt><dd>Guardadas y comprimidas por trabajo</dd>
+            </dl>
+            <p class="note" style="margin-top:14px">Las cuentas y los datos son siempre de Corazza.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  var views = ["inicio","clientes","cotizaciones","agenda","trabajos","inventario","dinero","fidelizacion","instagram","marketing","equipo","fases"];
+  var navBtns = document.querySelectorAll(".nav button");
+  function show(name, scrollTarget){
+    if(views.indexOf(name) < 0) name = "inicio";
+    views.forEach(function(v){ document.getElementById("v-"+v).classList.toggle("on", v===name); });
+    navBtns.forEach(function(b){ if(b.dataset.view===name) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
+    var active = document.querySelector('.nav button[data-view="'+name+'"]');
+    if(active && active.scrollIntoView && window.matchMedia("(max-width:900px)").matches) active.scrollIntoView({block:"nearest",inline:"center"});
+    try{ history.replaceState(null,"","#"+name); }catch(e){}
+    if(scrollTarget){ var el=document.getElementById(scrollTarget); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); }
+    else window.scrollTo(0,0);
+  }
+  navBtns.forEach(function(b){ b.addEventListener("click", function(){ show(b.dataset.view); }); });
+  document.addEventListener("click", function(e){
+    var t = e.target.closest("[data-go]"); if(!t) return;
+    var go = t.dataset.go;
+    if(go==="ficha") show("clientes","ficha"); else show(go);
+  });
+  show((location.hash||"").replace("#",""));
+
+  // Validar codigo (datos de ejemplo)
+  var codes = {
+    "CZ10-7KQ4": {ok:true, txt:"Activo · 10% de descuento · María Fernández", sub:"Primera compra · generado el 21/11"},
+    "CZ05-M3TA": {ok:false, cls:"warn", txt:"Ya usado · 5% · Ana Pérez", sub:"Canjeado el 23/11 por Carla en COT-0018"}
+  };
+  var form = document.getElementById("val-form"), input = document.getElementById("val-code"), out = document.getElementById("val-out");
+  function validate(){
+    var c = input.value.trim().toUpperCase(), r = codes[c];
+    if(!c){ out.className="result neu"; out.innerHTML="<div><b>Escribe un código</b></div>"; return; }
+    if(r && r.ok){ out.className="result ok"; out.innerHTML='<span class="code-big" style="font-size:22px">✓</span><div><b>'+r.txt+'</b><div class="note">'+r.sub+'</div></div><button class="btn primary" type="button" id="redeem" style="margin-left:auto">Canjear</button>'; }
+    else if(r){ out.className="result warn"; out.innerHTML='<span class="code-big" style="font-size:22px">!</span><div><b>'+r.txt+'</b><div class="note">'+r.sub+'</div></div>'; }
+    else { out.className="result crit"; out.innerHTML='<span class="code-big" style="font-size:22px">×</span><div><b>Este código no existe</b><div class="note">Revisa que esté bien escrito.</div></div>'; }
+  }
+  form.addEventListener("submit", function(e){ e.preventDefault(); validate(); });
+  out.addEventListener("click", function(e){
+    if(e.target.id==="redeem"){ codes["CZ10-7KQ4"]={ok:false,txt:"Ya usado · 10% · María Fernández",sub:"Canjeado ahora mismo"}; out.className="result warn"; out.innerHTML='<span class="code-big" style="font-size:22px">✓</span><div><b>Canjeado</b><div class="note">El código CZ10-7KQ4 ya no se puede volver a usar.</div></div>'; }
+  });
+  validate();
+
+  // Generar codigo
+  var pct = "10";
+  document.querySelectorAll("#gen-type button").forEach(function(b){
+    b.addEventListener("click", function(){
+      pct = b.dataset.p;
+      document.querySelectorAll("#gen-type button").forEach(function(x){ x.setAttribute("aria-pressed", x===b ? "true":"false"); });
+    });
+  });
+  document.getElementById("gen-btn").addEventListener("click", function(){
+    var chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789", s="";
+    for(var i=0;i<4;i++) s += chars[Math.floor(Math.random()*chars.length)];
+    document.getElementById("gen-out").textContent = "CZ" + (pct==="10"?"10":"05") + "-" + s;
+  });
+})();
+</script>
+</body>
+</html>
