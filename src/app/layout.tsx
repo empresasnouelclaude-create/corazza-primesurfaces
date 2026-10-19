@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Montserrat } from "next/font/google";
+import Medicion from "./components/Medicion";
 import { CORAZZA_DOMAIN } from "./config";
 import "./globals.css";
 
@@ -60,6 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es" className={`${cormorant.variable} ${montserrat.variable}`}>
       <body className="font-corazza-sans bg-corazza-white text-corazza-charcoal antialiased">
         {children}
+        <Medicion />
       </body>
     </html>
   );
