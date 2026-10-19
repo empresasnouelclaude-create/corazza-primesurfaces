@@ -11,8 +11,12 @@ import type { Accion, Conversacion, Entrada } from "./tipos.ts";
 export type ParametrosIA = Anthropic.Beta.Messages.MessageCreateParamsNonStreaming;
 export type CrearMensaje = (params: ParametrosIA) => Promise<Anthropic.Beta.BetaMessage>;
 
-/** Modelo por defecto; se cambia con la variable ASISTENTE_MODELO. */
-export const MODELO_POR_DEFECTO = "claude-opus-5-5";
+/**
+ * Modelo por defecto: Haiku, el mas economico (decision de presupuesto).
+ * Se cambia sin tocar codigo con la variable ASISTENTE_MODELO, por ejemplo
+ * "claude-sonnet-5-5" si hace falta mas calidad.
+ */
+export const MODELO_POR_DEFECTO = "claude-haiku-5-5";
 
 /** Mensaje cuando la IA no puede seguir y la conversacion pasa al equipo. */
 export const MENSAJE_PASE = "Gracias por escribirnos. Le paso tu mensaje a alguien del equipo para que te ayude en breve.";
@@ -41,6 +45,9 @@ function contenidoCliente(entrada: Entrada): Anthropic.Beta.BetaContentBlockPara
 }
 
 export function parametrosIA(conversacion: Conversacion, modelo: string): ParametrosIA {
+  // Haiku no tiene modelo de respaldo: alli no se pide (se maneja el rechazo
+  // pasando la conversacion al vendedor).
+  const conRespaldo = !modelo.startsWith("claude-haiku");
   return {
     model: modelo,
     max_tokens: 4000,
@@ -52,9 +59,8 @@ export function parametrosIA(conversacion: Conversacion, modelo: string): Parame
     // Las instrucciones y herramientas no cambian: se cachean.
     cache_control: { type: "ephemeral" },
     // Si el modelo declina por politica, la API reintenta con el modelo de
-    // respaldo recomendado. En modelos sin respaldo no tiene efecto.
-    betas: ["server-side-fallback-2026-07-01"],
-    fallbacks: "default",
+    // respaldo recomendado (Sonnet y Opus).
+    ...(conRespaldo ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const } : {}),
   };
 }
 

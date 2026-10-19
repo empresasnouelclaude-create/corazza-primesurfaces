@@ -77,7 +77,7 @@ Variables de entorno (Vercel → Settings → Environment Variables):
 | Variable | Para qué |
 |---|---|
 | `ANTHROPIC_API_KEY` | API de Claude |
-| `ASISTENTE_MODELO` | Opcional. Modelo de IA; por defecto `claude-opus-5-5` (también `claude-sonnet-5-5` o `claude-haiku-5-5`) |
+| `ASISTENTE_MODELO` | Opcional. Modelo de IA; por defecto `claude-haiku-5-5` (el más económico). Para más calidad: `claude-sonnet-5-5` |
 | `ASISTENTE_PRUEBA_CLAVE` | Clave del simulador |
 | `WHATSAPP_TOKEN` | Token de acceso de la app de WhatsApp en Meta |
 | `WHATSAPP_PHONE_NUMBER_ID` | ID del número de WhatsApp de Corazza |

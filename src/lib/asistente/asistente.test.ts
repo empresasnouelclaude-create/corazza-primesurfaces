@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import type Anthropic from "@anthropic-ai/sdk";
 import { HERRAMIENTAS, ejecutarHerramienta } from "./herramientas.ts";
-import { MENSAJE_PASE, responder, type CrearMensaje, type ParametrosIA } from "./motor.ts";
+import { MENSAJE_PASE, parametrosIA, responder, type CrearMensaje, type ParametrosIA } from "./motor.ts";
 import { instruccionesAsistente } from "./prompt.ts";
 import { nuevaConversacion } from "./tipos.ts";
 import { firmaValida, leerMensajes, verificarSuscripcion } from "./whatsapp.ts";
@@ -78,8 +78,15 @@ test("motor: ejecuta herramientas, devuelve el texto y conserva el historial", a
   // usuario, asistente (herramienta), resultado, asistente (texto)
   assert.equal(r.conversacion.mensajes.length, 4);
   assert.equal(llamadas.length, 2);
-  assert.equal(llamadas[0].fallbacks, "default");
-  assert.equal(llamadas[0].model, "claude-opus-5-5");
+  assert.equal(llamadas[0].model, "claude-haiku-5-5");
+  assert.equal(llamadas[0].fallbacks, undefined); // Haiku no tiene respaldo
+  assert.equal(llamadas[0].output_config?.effort, "low");
+});
+
+test("parametros: con Sonnet u Opus se pide el modelo de respaldo", () => {
+  const p = parametrosIA(nuevaConversacion("1"), "claude-sonnet-5-5");
+  assert.equal(p.fallbacks, "default");
+  assert.deepEqual(p.betas, ["server-side-fallback-2026-07-01"]);
 });
 
 test("motor: con la conversacion en manos del vendedor, guarda el mensaje pero no llama a la IA", async () => {
