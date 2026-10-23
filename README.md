@@ -84,6 +84,15 @@ Variables de entorno (Vercel → Settings → Environment Variables):
 | `WHATSAPP_VERIFY_TOKEN` | Texto que se escribe en Meta al configurar el webhook |
 | `WHATSAPP_APP_SECRET` | Secreto de la app de Meta (para comprobar que los avisos vienen de Meta) |
 
+## Panel: documentos de Citrus (`/panel/documentos`)
+
+Corazza cotiza y factura en **Citrus ERP**. El panel no crea cotizaciones ni facturas: se sube el PDF que genera Citrus (cotización, factura, cuentas por cobrar o inventario) y la IA lo lee y lo ordena: totales del mes, facturas con saldo, quién debe e inventario.
+
+- Lectura: `src/lib/citrus/leer.ts` (Claude con salida estructurada; modelo por defecto `claude-haiku-5-5`, se cambia con `CITRUS_MODELO`).
+- Totales y unión de documentos: `src/lib/citrus/resumen.ts`. Si el mismo número de factura llega en otro PDF (por ejemplo el reporte de cuentas por cobrar), se actualiza su saldo.
+- Variables: `PANEL_CLAVE` (clave de la página) y `ANTHROPIC_API_KEY`.
+- **Versión de prueba:** los datos se guardan en el navegador hasta conectar la base de datos. PDF de hasta 3 MB.
+
 ## Reemplazar fotos
 
 Las imágenes viven en `public/`:
