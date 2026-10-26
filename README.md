@@ -47,6 +47,52 @@ Para protegerla con contraseña más adelante: Vercel → Settings →
 Deployment Protection (plan Pro), o agregar una contraseña propia en
 `src/proxy.ts`/middleware.
 
+## Medición de anuncios (Pixel de Meta)
+
+`src/app/components/Medicion.tsx`, montado en `layout.tsx`:
+
+- **Pixel de Meta:** se activa al crear en Vercel la variable `NEXT_PUBLIC_META_PIXEL_ID` (y volver a publicar). Registra visitas (`PageView`) y cada clic a WhatsApp (`Contact`). Sin la variable no se carga nada.
+- **Origen de cada cliente:** si la visita llega con UTM (por ejemplo `?utm_source=ig&utm_content=cafe`), al abrir WhatsApp el mensaje termina con `(ref: cafe)`. Usa `utm_content`, si no `utm_campaign`, si no `utm_source`. Funciona aunque no haya Pixel.
+
+## Asistente de WhatsApp (en construcción)
+
+Asistente con IA (Claude) que atiende el WhatsApp de Corazza, recoge los datos para cotizar y pasa el caso al vendedor. El código está en `src/lib/asistente/`:
+
+| Archivo | Qué es |
+|---|---|
+| `prompt.ts` | Tono y reglas del asistente |
+| `conocimiento.ts` | Lo que sabe de Corazza (sale de `portafolio.ts`); lo pendiente está marcado `TODO(dueño)` |
+| `herramientas.ts` | Acciones: guardar datos, guía de medición, fotos, pasar al vendedor |
+| `motor.ts` | La conversación con la IA |
+| `whatsapp.ts` | API de WhatsApp de Meta (webhook, firma, envío) |
+| `almacen.ts` | Dónde se guardan las conversaciones (hoy en memoria: **falta la base de datos antes de usarlo con clientes**) |
+
+Rutas:
+
+- `/asistente-prueba`: simulador para probar conversaciones sin WhatsApp (no se guarda nada). Pide la clave `ASISTENTE_PRUEBA_CLAVE`.
+- `/api/whatsapp`: webhook para Meta. Sin las variables de abajo responde 503 y no hace nada.
+
+Variables de entorno (Vercel → Settings → Environment Variables):
+
+| Variable | Para qué |
+|---|---|
+| `ANTHROPIC_API_KEY` | API de Claude |
+| `ASISTENTE_MODELO` | Opcional. Modelo de IA; por defecto `claude-haiku-5-5` (el más económico). Para más calidad: `claude-sonnet-5-5` |
+| `ASISTENTE_PRUEBA_CLAVE` | Clave del simulador |
+| `WHATSAPP_TOKEN` | Token de acceso de la app de WhatsApp en Meta |
+| `WHATSAPP_PHONE_NUMBER_ID` | ID del número de WhatsApp de Corazza |
+| `WHATSAPP_VERIFY_TOKEN` | Texto que se escribe en Meta al configurar el webhook |
+| `WHATSAPP_APP_SECRET` | Secreto de la app de Meta (para comprobar que los avisos vienen de Meta) |
+
+## Panel: documentos de Citrus (`/panel/documentos`)
+
+Corazza cotiza y factura en **Citrus ERP**. El panel no crea cotizaciones ni facturas: se sube el PDF que genera Citrus (cotización, factura, cuentas por cobrar o inventario) y la IA lo lee y lo ordena: totales del mes, facturas con saldo, quién debe e inventario.
+
+- Lectura: `src/lib/citrus/leer.ts` (Claude con salida estructurada; modelo por defecto `claude-haiku-5-5`, se cambia con `CITRUS_MODELO`).
+- Totales y unión de documentos: `src/lib/citrus/resumen.ts`. Si el mismo número de factura llega en otro PDF (por ejemplo el reporte de cuentas por cobrar), se actualiza su saldo.
+- Variables: `PANEL_CLAVE` (clave de la página) y `ANTHROPIC_API_KEY`.
+- **Versión de prueba:** los datos se guardan en el navegador hasta conectar la base de datos. PDF de hasta 3 MB.
+
 ## Reemplazar fotos
 
 Las imágenes viven en `public/`:
