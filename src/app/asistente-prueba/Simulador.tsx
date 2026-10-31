@@ -154,7 +154,7 @@ export default function Simulador() {
           <div className="flex-1 space-y-3 overflow-y-auto p-4" aria-live="polite">
             {burbujas.length === 0 && (
               <p className="mx-auto max-w-sm pt-10 text-center text-sm text-corazza-taupe">
-                Escribe como si fueras un cliente. Por ejemplo: “Hola, quiero proteger la isla de mi cocina”.
+                Escribe como si fueras un cliente. Por ejemplo: “Hola, quiero proteger mi mesa de comedor de mármol”.
               </p>
             )}
             {burbujas.map((b, i) => {

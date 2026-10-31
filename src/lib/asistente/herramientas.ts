@@ -18,7 +18,7 @@ export const HERRAMIENTAS: Anthropic.Beta.BetaTool[] = [
       type: "object",
       properties: {
         nombre: { ...texto, description: "Nombre del cliente" },
-        superficie: { ...texto, description: "Qué quiere proteger, por ejemplo 'isla de cocina' o 'mesa de comedor'" },
+        superficie: { ...texto, description: "Qué quiere proteger, por ejemplo 'mesa de comedor', 'mesa de centro', 'mesa auxiliar', 'repisa' o 'recibidor'" },
         material: { ...texto, description: "Material: mármol, cuarzo, granito, madera, porcelanato u otro" },
         medidas: { ...texto, description: "Medidas tal como las dio, con unidad, por ejemplo '240 x 90 cm'" },
         sector: { ...texto, description: "Sector o ciudad" },
