@@ -47,9 +47,9 @@ test("herramientas: definiciones estrictas y con nombres conocidos", () => {
 
 test("guardar_datos_cliente: guarda lo nuevo, no borra con null e informa lo que falta", () => {
   let conv = nuevaConversacion("18095550142", AHORA);
-  conv = ejecutarHerramienta("guardar_datos_cliente", { superficie: "isla", material: "cuarzo", medidas: null }, conv).conversacion;
+  conv = ejecutarHerramienta("guardar_datos_cliente", { superficie: "mesa de comedor", material: "cuarzo", medidas: null }, conv).conversacion;
   const r = ejecutarHerramienta("guardar_datos_cliente", { superficie: null, medidas: "240 x 90 cm" }, conv);
-  assert.equal(r.conversacion.datos.superficie, "isla");
+  assert.equal(r.conversacion.datos.superficie, "mesa de comedor");
   assert.equal(r.conversacion.datos.medidas, "240 x 90 cm");
   assert.deepEqual(JSON.parse(r.resultado).faltan, ["sector", "fecha_deseada"]);
 });
@@ -63,17 +63,17 @@ test("pasar_a_vendedor: cambia el estado y genera el aviso", () => {
 
 test("motor: ejecuta herramientas, devuelve el texto y conserva el historial", async () => {
   const { crear, llamadas } = iaFalsa([
-    { stop_reason: "tool_use", content: [usar("t1", "guardar_datos_cliente", { superficie: "isla", material: "cuarzo" })] },
+    { stop_reason: "tool_use", content: [usar("t1", "guardar_datos_cliente", { superficie: "mesa de comedor", material: "cuarzo" })] },
     { stop_reason: "end_turn", content: [texto("¡Qué bien! ¿Me compartes las medidas aproximadas?")] },
   ]);
   const r = await responder({
     conversacion: nuevaConversacion("18095550142", AHORA),
-    entrada: { texto: "Hola, tengo una isla de cuarzo", nombrePerfil: "Patricia" },
+    entrada: { texto: "Hola, tengo una mesa de comedor de cuarzo", nombrePerfil: "Patricia" },
     crear,
     ahora: AHORA,
   });
   assert.deepEqual(r.respuestas, ["¡Qué bien! ¿Me compartes las medidas aproximadas?"]);
-  assert.equal(r.conversacion.datos.superficie, "isla");
+  assert.equal(r.conversacion.datos.superficie, "mesa de comedor");
   assert.equal(r.conversacion.datos.nombre, "Patricia");
   // usuario, asistente (herramienta), resultado, asistente (texto)
   assert.equal(r.conversacion.mensajes.length, 4);
@@ -142,7 +142,7 @@ test("whatsapp: lee texto e imagen con el nombre del perfil e ignora estados", (
               contacts: [{ wa_id: "18095550142", profile: { name: "Patricia" } }],
               messages: [
                 { id: "m1", from: "18095550142", type: "text", text: { body: "Hola" } },
-                { id: "m2", from: "18095550142", type: "image", image: { id: "media1", caption: "Mi isla" } },
+                { id: "m2", from: "18095550142", type: "image", image: { id: "media1", caption: "Mi mesa" } },
               ],
             },
           },
@@ -155,7 +155,7 @@ test("whatsapp: lee texto e imagen con el nombre del perfil e ignora estados", (
   assert.equal(m.length, 2);
   assert.deepEqual(m[0], { id: "m1", de: "18095550142", nombrePerfil: "Patricia", tipo: "texto", texto: "Hola", mediaId: null });
   assert.equal(m[1].mediaId, "media1");
-  assert.equal(m[1].texto, "Mi isla");
+  assert.equal(m[1].texto, "Mi mesa");
 });
 
 test("almacen en memoria: no atiende dos veces el mismo mensaje", async () => {
