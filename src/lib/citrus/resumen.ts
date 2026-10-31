@@ -26,7 +26,7 @@ export function unirDocumentos(actuales: DocumentoGuardado[], nuevos: DocumentoG
     const combinado = { ...previo } as Record<string, unknown>;
     for (const [campo, valor] of Object.entries(nuevo)) {
       // Se conserva de que PDF salio el documento la primera vez.
-      if (campo === "id" || campo === "archivo" || campo === "subido") continue;
+      if (campo === "id" || campo === "archivo" || campo === "subido" || campo === "pdf") continue;
       if (campo === "lineas" && Array.isArray(valor) && valor.length === 0) continue;
       if (campo === "estado" && valor === "desconocido") continue;
       if (valor !== null && valor !== undefined) combinado[campo] = valor;

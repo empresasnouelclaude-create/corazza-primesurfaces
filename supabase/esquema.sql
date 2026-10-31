@@ -1,0 +1,47 @@
+-- Base de datos de Corazza (Supabase).
+-- Se pega UNA vez en Supabase → SQL Editor → New query → Run.
+-- Se puede volver a correr sin problema: no borra nada.
+--
+-- Todas las tablas tienen RLS activado y sin politicas: nadie puede leerlas
+-- desde el navegador. Solo el servidor de la web (con la clave service_role)
+-- entra a los datos.
+
+-- Conversaciones del asistente de WhatsApp (una por telefono).
+create table if not exists conversaciones (
+  id text primary key,                    -- telefono, sin "+"
+  estado text not null default 'asistente', -- 'asistente' | 'vendedor'
+  datos jsonb not null default '{}',       -- ficha del cliente
+  mensajes jsonb not null default '[]',    -- historial con la IA
+  pase jsonb,                              -- cuando se paso al vendedor
+  actualizado timestamptz not null default now()
+);
+
+-- Mensajes de WhatsApp ya atendidos (Meta a veces reenvia el mismo aviso).
+create table if not exists mensajes_atendidos (
+  id text primary key,
+  creado timestamptz not null default now()
+);
+
+-- Documentos leidos de los PDF de Citrus.
+create table if not exists documentos_citrus (
+  id uuid primary key,
+  datos jsonb not null,                    -- el documento completo
+  subido timestamptz not null default now()
+);
+
+-- Ultimo reporte de inventario de Citrus (una sola fila).
+create table if not exists inventario_citrus (
+  id int primary key default 1 check (id = 1),
+  productos jsonb not null default '[]',
+  fecha timestamptz not null default now()
+);
+
+alter table conversaciones enable row level security;
+alter table mensajes_atendidos enable row level security;
+alter table documentos_citrus enable row level security;
+alter table inventario_citrus enable row level security;
+
+-- Carpeta privada para los PDF de Citrus.
+insert into storage.buckets (id, name, public)
+values ('citrus', 'citrus', false)
+on conflict (id) do nothing;

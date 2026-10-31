@@ -91,7 +91,23 @@ Corazza cotiza y factura en **Citrus ERP**. El panel no crea cotizaciones ni fac
 - Lectura: `src/lib/citrus/leer.ts` (Claude con salida estructurada; modelo por defecto `claude-haiku-5-5`, se cambia con `CITRUS_MODELO`).
 - Totales y unión de documentos: `src/lib/citrus/resumen.ts`. Si el mismo número de factura llega en otro PDF (por ejemplo el reporte de cuentas por cobrar), se actualiza su saldo.
 - Variables: `PANEL_CLAVE` (clave de la página) y `ANTHROPIC_API_KEY`.
-- **Versión de prueba:** los datos se guardan en el navegador hasta conectar la base de datos. PDF de hasta 3 MB.
+- PDF de hasta 3 MB. Con la base de datos conectada, los documentos y los PDF quedan guardados en Supabase; sin ella, el panel funciona en **modo de prueba** (datos solo en el navegador).
+
+## Base de datos (Supabase)
+
+Guarda las conversaciones del asistente y los documentos y PDF de Citrus del panel. Cuenta: redescorazza@gmail.com.
+
+1. En Supabase → **SQL Editor** → New query, pegar `supabase/esquema.sql` y **Run** (una sola vez; se puede repetir sin problema).
+2. En Vercel → Settings → Environment Variables (Production y Preview):
+
+| Variable | Dónde está en Supabase |
+| --- | --- |
+| `SUPABASE_URL` | Project Settings → Data API → Project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Project Settings → API Keys → `service_role` (secreta: solo en Vercel) |
+
+3. Volver a publicar (Deployments → ⋯ → Redeploy).
+
+Las tablas tienen RLS activado sin políticas: solo el servidor (con `service_role`) puede leerlas.
 
 ## Reemplazar fotos
 

@@ -3,11 +3,10 @@
 // POST: mensajes de clientes -> asistente -> respuestas por WhatsApp.
 //
 // No hace nada hasta que existan las variables de entorno (ver README,
-// "Asistente de WhatsApp"). PENDIENTE antes de usarlo con clientes reales:
-// guardar las conversaciones en la base de datos del panel (hoy se usan en
-// memoria y se pierden entre instancias de Vercel).
+// "Asistente de WhatsApp"). Las conversaciones se guardan en la base de datos
+// (Supabase); sin ella se usa memoria, que solo sirve para pruebas.
 import { after } from "next/server";
-import { AlmacenMemoria } from "@/lib/asistente/almacen.ts";
+import { AlmacenMemoria, AlmacenSupabase, type Almacen } from "@/lib/asistente/almacen.ts";
 import { configuracionIA } from "@/lib/asistente/ia.ts";
 import { responder } from "@/lib/asistente/motor.ts";
 import {
@@ -21,10 +20,14 @@ import {
   type CredencialesWhatsApp,
   type MensajeEntrante,
 } from "@/lib/asistente/whatsapp.ts";
+import { baseDeDatos } from "@/lib/supabase.ts";
 
-const almacen = new AlmacenMemoria();
-// Meta puede reenviar el mismo aviso; se ignoran los mensajes ya atendidos.
-const atendidos = new Set<string>();
+const memoria = new AlmacenMemoria();
+
+function elegirAlmacen(): Almacen {
+  const db = baseDeDatos();
+  return db ? new AlmacenSupabase(db) : memoria;
+}
 
 function credenciales(): CredencialesWhatsApp | null {
   const token = process.env.WHATSAPP_TOKEN;
@@ -46,14 +49,16 @@ export async function POST(request: Request) {
   const ia = configuracionIA();
   if (!cred || !ia) return new Response("Asistente sin configurar", { status: 503 });
 
-  const mensajes = leerMensajes(JSON.parse(cuerpo)).filter((m) => !atendidos.has(m.id));
-  mensajes.forEach((m) => atendidos.add(m.id));
+  const mensajes = leerMensajes(JSON.parse(cuerpo));
+  const guardado = elegirAlmacen();
 
   // Se responde 200 enseguida (Meta lo exige) y se atiende despues.
   after(async () => {
     for (const mensaje of mensajes) {
       try {
-        await atender(mensaje, cred, ia);
+        // Meta puede reenviar el mismo aviso; se ignoran los ya atendidos.
+        if (!(await guardado.marcarAtendido(mensaje.id))) continue;
+        await atender(mensaje, cred, ia, guardado);
       } catch (error) {
         console.error("Asistente WhatsApp:", error);
       }
@@ -66,6 +71,7 @@ async function atender(
   mensaje: MensajeEntrante,
   cred: CredencialesWhatsApp,
   ia: NonNullable<ReturnType<typeof configuracionIA>>,
+  almacen: Almacen,
 ) {
   await marcarLeido(cred, mensaje.id).catch(() => {});
   const conversacion = await almacen.obtener(mensaje.de);

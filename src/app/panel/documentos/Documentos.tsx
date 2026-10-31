@@ -4,9 +4,10 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent, type DragEvent 
 import { resumen, saldoDe, unirDocumentos } from "@/lib/citrus/resumen.ts";
 import type { DocumentoGuardado, EstadoPago, LecturaPDF, ProductoInventario } from "@/lib/citrus/tipos.ts";
 
-// MODO DE PRUEBA: hasta conectar la base de datos del panel, los datos se
-// guardan solo en este navegador (localStorage). Los PDF no se guardan: solo
-// se pueden volver a ver durante la sesion en la que se subieron.
+// Con la base de datos conectada (Supabase), los documentos y los PDF se
+// guardan en el servidor y los ve cualquiera que entre con la clave.
+// Sin ella (modo de prueba), los datos se guardan solo en este navegador
+// (localStorage) y los PDF solo se pueden ver durante la sesion.
 const CLAVE_DATOS = "corazza-panel-citrus";
 const MAX_BYTES = 3 * 1024 * 1024;
 
@@ -55,27 +56,88 @@ export default function Documentos() {
   const [arrastrando, setArrastrando] = useState(false);
   const claveRef = useRef<HTMLInputElement>(null);
   const [pdfs, setPdfs] = useState<Record<string, string>>({}); // archivo -> URL temporal del PDF
-  const cargado = useRef(false);
+  // null: aun no se sabe; true: base de datos; false: modo de prueba (navegador).
+  const [conectado, setConectado] = useState<boolean | null>(null);
+  const [aviso, setAviso] = useState<string | null>(null);
 
-  // Cargar lo guardado en este navegador (una sola vez al abrir).
-  useEffect(() => {
+  function guardarClave() {
+    const clave = claveRef.current?.value ?? "";
+    try {
+      sessionStorage.setItem("panel-clave", clave);
+    } catch {}
+    return clave;
+  }
+
+  function cargarDelNavegador() {
     try {
       const guardado = localStorage.getItem(CLAVE_DATOS);
-      if (claveRef.current) claveRef.current.value = sessionStorage.getItem("panel-clave") ?? "";
-      if (guardado) {
-        const leido = JSON.parse(guardado) as Datos;
-        queueMicrotask(() => setDatos({ ...VACIO, ...leido }));
+      setDatos(guardado ? { ...VACIO, ...(JSON.parse(guardado) as Datos) } : VACIO);
+    } catch {
+      setDatos(VACIO);
+    }
+  }
+
+  async function entrar() {
+    const clave = guardarClave();
+    if (!clave) return;
+    setAviso("Cargando…");
+    try {
+      const res = await fetch("/api/panel/datos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clave }),
+      });
+      const r = await res.json();
+      if (!res.ok) throw new Error(r.error ?? "Error del servidor.");
+      if (r.conectado) {
+        setDatos({ ...VACIO, ...r.datos });
+        setConectado(true);
+      } else {
+        cargarDelNavegador();
+        setConectado(false);
       }
+      setAviso(null);
+    } catch (e) {
+      setAviso(e instanceof Error ? e.message : "No se pudo cargar.");
+    }
+  }
+
+  // Al abrir: si la clave ya se escribio en esta sesion, entrar solo.
+  useEffect(() => {
+    let clave = "";
+    try {
+      clave = sessionStorage.getItem("panel-clave") ?? "";
     } catch {}
-    cargado.current = true;
+    if (claveRef.current) claveRef.current.value = clave;
+    if (clave) queueMicrotask(() => void entrar());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // En modo de prueba, lo leido se guarda en este navegador.
   useEffect(() => {
-    if (!cargado.current) return;
+    if (conectado !== false) return;
     try {
       localStorage.setItem(CLAVE_DATOS, JSON.stringify(datos));
     } catch {}
-  }, [datos]);
+  }, [datos, conectado]);
+
+  async function verPDF(ruta: string) {
+    const ventana = window.open("", "_blank");
+    try {
+      const res = await fetch("/api/panel/datos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clave: guardarClave(), pdf: ruta }),
+      });
+      const r = await res.json();
+      if (!res.ok) throw new Error(r.error);
+      if (ventana) ventana.location.href = r.url;
+      else window.location.href = r.url;
+    } catch {
+      ventana?.close();
+      setAviso("No se pudo abrir el PDF.");
+    }
+  }
 
   const [desde, hasta] = mes === "todo" ? [undefined, undefined] : [`${mes}-01`, `${mes}-31`];
   const totales = useMemo(() => resumen(datos.documentos, desde, hasta), [datos.documentos, desde, hasta]);
@@ -87,10 +149,8 @@ export default function Documentos() {
   if (!meses.includes(mesActual())) meses.unshift(mesActual());
 
   async function subir(archivos: File[]) {
-    const clave = claveRef.current?.value ?? "";
-    try {
-      sessionStorage.setItem("panel-clave", clave);
-    } catch {}
+    const clave = guardarClave();
+    if (conectado === null) await entrar();
     setAdvertencias([]);
     for (const archivo of archivos) {
       const nombre = archivo.name;
@@ -114,16 +174,23 @@ export default function Documentos() {
         });
         const r = await res.json();
         if (!res.ok) throw new Error(r.error ?? "Error del servidor.");
-        const lectura = r as LecturaPDF;
-        const subido = new Date().toISOString();
-        const nuevos: DocumentoGuardado[] = lectura.documentos.map((d) => ({ ...d, id: crypto.randomUUID(), archivo: nombre, subido }));
-        const url = URL.createObjectURL(archivo);
-        setPdfs((m) => ({ ...m, [nombre]: url }));
-        setDatos((prev) => ({
-          documentos: unirDocumentos(prev.documentos, nuevos),
-          inventario: lectura.inventario.length ? lectura.inventario : prev.inventario,
-          inventarioFecha: lectura.inventario.length ? subido : prev.inventarioFecha,
-        }));
+        const lectura = r.lectura as LecturaPDF;
+        const nuevos = lectura.documentos;
+        if (r.datos) {
+          // Guardado en la base de datos: se muestra lo que quedo guardado.
+          setDatos({ ...VACIO, ...(r.datos as Datos) });
+          setConectado(true);
+        } else {
+          const subido = new Date().toISOString();
+          const guardados: DocumentoGuardado[] = nuevos.map((d) => ({ ...d, id: crypto.randomUUID(), archivo: nombre, subido }));
+          const url = URL.createObjectURL(archivo);
+          setPdfs((m) => ({ ...m, [nombre]: url }));
+          setDatos((prev) => ({
+            documentos: unirDocumentos(prev.documentos, guardados),
+            inventario: lectura.inventario.length ? lectura.inventario : prev.inventario,
+            inventarioFecha: lectura.inventario.length ? subido : prev.inventarioFecha,
+          }));
+        }
         setAdvertencias((a) => [...a, ...lectura.advertencias.map((t) => `${nombre}: ${t}`)]);
         const partes = [
           nuevos.length && `${nuevos.length} documento${nuevos.length === 1 ? "" : "s"}`,
@@ -209,19 +276,38 @@ export default function Documentos() {
             <p className="font-corazza-serif text-2xl font-semibold tracking-[0.14em]">CORAZZA</p>
             <p className="text-[11px] uppercase tracking-[0.2em] text-corazza-cream">Panel · Documentos de Citrus</p>
           </div>
-          <div className="flex items-center gap-2">
+          <form
+            className="flex items-center gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void entrar();
+            }}
+          >
             <label htmlFor="clave" className="text-xs text-corazza-cream">
               Clave
             </label>
             <input id="clave" ref={claveRef} type="password" autoComplete="off" className="min-h-[40px] w-40 rounded-lg bg-corazza-white/10 px-3 text-base text-corazza-white" />
-          </div>
+            <button type="submit" className="min-h-[40px] rounded-lg bg-corazza-cream px-3 text-sm font-semibold text-corazza-charcoal">
+              Entrar
+            </button>
+          </form>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-8">
-        <p className="rounded-xl bg-[#F5E8CC] px-4 py-2.5 text-sm text-[#5C4314]">
-          Versión de prueba: los datos se guardan solo en este navegador hasta conectar la base de datos del panel.
-        </p>
+        {aviso && (
+          <p role="status" className="rounded-xl bg-corazza-cream/60 px-4 py-2.5 text-sm">
+            {aviso}
+          </p>
+        )}
+        {conectado === null && !aviso && (
+          <p className="rounded-xl bg-corazza-cream/60 px-4 py-2.5 text-sm">Escribe la clave arriba y toca Entrar para ver los documentos.</p>
+        )}
+        {conectado === false && (
+          <p className="rounded-xl bg-[#F5E8CC] px-4 py-2.5 text-sm text-[#5C4314]">
+            Versión de prueba: los datos se guardan solo en este navegador hasta conectar la base de datos del panel.
+          </p>
+        )}
 
         {/* Subir PDF */}
         <section
@@ -417,7 +503,15 @@ export default function Documentos() {
                 {detalle.notas && <p className="text-xs text-corazza-taupe">{detalle.notas}</p>}
                 <p className="text-xs text-corazza-taupe">
                   Leído de: {detalle.archivo}
-                  {pdfs[detalle.archivo] && (
+                  {detalle.pdf && (
+                    <>
+                      {" · "}
+                      <button type="button" onClick={() => void verPDF(detalle.pdf!)} className="font-semibold text-corazza-charcoal underline">
+                        Ver PDF
+                      </button>
+                    </>
+                  )}
+                  {!detalle.pdf && pdfs[detalle.archivo] && (
                     <>
                       {" · "}
                       <a href={pdfs[detalle.archivo]} target="_blank" rel="noreferrer" className="font-semibold text-corazza-charcoal underline">
@@ -431,7 +525,7 @@ export default function Documentos() {
           </aside>
         </section>
 
-        <div className="flex flex-wrap items-center gap-3 text-sm">
+        <div className={`flex flex-wrap items-center gap-3 text-sm ${conectado === false ? "" : "hidden"}`}>
           {!confirmarBorrado ? (
             <button type="button" onClick={() => setConfirmarBorrado(true)} className="text-corazza-taupe underline">
               Borrar todos los datos de este navegador

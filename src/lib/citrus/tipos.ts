@@ -62,4 +62,6 @@ export type DocumentoGuardado = DocumentoCitrus & {
   id: string;
   archivo: string;
   subido: string;
+  /** Donde quedo guardado el PDF en la base de datos (si esta conectada). */
+  pdf?: string | null;
 };
