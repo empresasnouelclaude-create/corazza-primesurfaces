@@ -157,3 +157,10 @@ test("whatsapp: lee texto e imagen con el nombre del perfil e ignora estados", (
   assert.equal(m[1].mediaId, "media1");
   assert.equal(m[1].texto, "Mi isla");
 });
+
+test("almacen en memoria: no atiende dos veces el mismo mensaje", async () => {
+  const { AlmacenMemoria } = await import("./almacen.ts");
+  const a = new AlmacenMemoria();
+  assert.equal(await a.marcarAtendido("wamid.1"), true);
+  assert.equal(await a.marcarAtendido("wamid.1"), false);
+});
