@@ -9,7 +9,6 @@
 // ============================================================================
 
 import {
-  APLICACIONES,
   BENEFICIOS,
   EXPERIENCIA,
   SERVICIO,
@@ -30,7 +29,6 @@ export const GUIA_MEDICION_URL = `${SITIO}/#como-medir`;
 // TODO(dueño): agregar fotos reales de instalaciones (JPG) cuando existan.
 export const FOTOS_TRABAJOS = {
   acabado: [{ url: `${SITIO}/portafolio/acabado-high-gloss.jpg`, pie: "Lámina Corazza High Gloss: brillo super transparente" }],
-  cocina: [{ url: `${SITIO}/portafolio/cocina-isla-marmol.jpg`, pie: "Isla de mármol: así luce una superficie protegida" }],
   kit: [{ url: `${SITIO}/hero-producto.jpg`, pie: "Kit de cuidado que recibe cada cliente" }],
 } as const;
 
@@ -57,8 +55,9 @@ Por ahora solo hay un acabado disponible (High Gloss). Si preguntan por un acaba
 MATERIALES QUE SE PROTEGEN
 ${SUPERFICIES.items.join(", ")}.
 
-DÓNDE SE USA
-${APLICACIONES.body}
+DÓNDE SE USA (por ahora)
+Mesas de comedor, mesas de centro, mesas auxiliares, repisas y recibidores en superficies de piedra.
+Por ahora Corazza no ofrece cocinas, topes de cocina ni islas: no los ofrezcas ni los pongas de ejemplo. Si un cliente pregunta por eso, dile con amabilidad que por el momento Corazza se enfoca en mesas, repisas y recibidores, y que si quiere, le pasas su caso al equipo para evaluarlo.
 
 BENEFICIOS
 ${BENEFICIOS.items.map((b) => `- ${b.title}: ${b.body}`).join("\n")}
@@ -70,8 +69,8 @@ DESPUÉS DE LA INSTALACIÓN
 Cada cliente recibe el kit de cuidado: ${EXPERIENCIA.items.join(", ").toLowerCase()}. La tarjeta QR sirve para registrar la garantía.
 
 CÓMO MEDIR
-La web tiene una guía con dibujos para medir topes lineales, en L, en U, circulares y backsplash: ${GUIA_MEDICION_URL}
-Para cotizar basta con medidas aproximadas (largo y ancho) o una foto; si hace falta, el equipo hace una visita de medición.
+La web tiene una guía con dibujos para medir superficies rectangulares (largo y ancho) y redondas (diámetro): ${GUIA_MEDICION_URL}
+Para cotizar basta con medidas aproximadas; si hace falta, el equipo hace una visita de medición.
 
 CÓMO SE TRABAJA (decisiones de la reunión de experiencia del cliente)
 - Cotización: el vendedor la envía el mismo día, en horario laboral. Si escriben fuera de horario, el caso queda listo y el equipo responde a primera hora.

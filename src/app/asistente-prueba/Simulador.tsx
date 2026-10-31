@@ -14,7 +14,7 @@ const ETIQUETAS: Record<keyof DatosCliente, string> = {
   superficie: "Superficie",
   material: "Material",
   medidas: "Medidas",
-  sector: "Sector",
+  sector: "Ciudad y sector",
   fecha_deseada: "Para cuándo",
   notas: "Notas",
 };

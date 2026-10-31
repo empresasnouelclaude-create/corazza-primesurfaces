@@ -1,4 +1,4 @@
-import { GUIA } from "../../guia-medicion";
+import { GUIA, MOSTRAR_COCINA } from "../../guia-medicion";
 import { DrawLine } from "../portafolio/motion";
 import Reveal from "../Reveal";
 
@@ -278,28 +278,30 @@ export default function GuiaMedicion() {
           </div>
         </div>
 
-        <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div className={`mt-14 grid grid-cols-1 gap-5 md:grid-cols-2 ${MOSTRAR_COCINA ? "lg:grid-cols-3" : "lg:max-w-4xl"}`}>
           {/* Backsplash (salpicadero) */}
-          <Reveal y={14} className="md:col-span-2 lg:col-span-1">
-            <article className={PANEL}>
-              <div>
-                <PanelTitle id="guia-backsplash" strong={GUIA.backsplash.title} />
-                <p className="mt-2 font-corazza-sans text-sm tracking-[0.06em] text-corazza-taupe">{GUIA.backsplash.subtitle}</p>
-              </div>
-              <div className="mt-8 flex flex-1 items-center">
-                <Diagram
-                  labelledBy="guia-backsplash"
-                  viewBox="0 0 240 150"
-                  shapes={[{ kind: "poly", points: "56,52 100,52 100,22 184,22 184,52 228,52 228,112 56,112" }]}
-                  badges={[{ x: 142, y: 76, n: 1 }]}
-                  dims={[
-                    { x1: 44, y1: 22, x2: 44, y2: 112, label: ALTO, side: "left" },
-                    { x1: 56, y1: 126, x2: 228, y2: 126, label: LARGO, side: "bottom" },
-                  ]}
-                />
-              </div>
-            </article>
-          </Reveal>
+          {MOSTRAR_COCINA && (
+            <Reveal y={14} className="md:col-span-2 lg:col-span-1">
+              <article className={PANEL}>
+                <div>
+                  <PanelTitle id="guia-backsplash" strong={GUIA.backsplash.title} />
+                  <p className="mt-2 font-corazza-sans text-sm tracking-[0.06em] text-corazza-taupe">{GUIA.backsplash.subtitle}</p>
+                </div>
+                <div className="mt-8 flex flex-1 items-center">
+                  <Diagram
+                    labelledBy="guia-backsplash"
+                    viewBox="0 0 240 150"
+                    shapes={[{ kind: "poly", points: "56,52 100,52 100,22 184,22 184,52 228,52 228,112 56,112" }]}
+                    badges={[{ x: 142, y: 76, n: 1 }]}
+                    dims={[
+                      { x1: 44, y1: 22, x2: 44, y2: 112, label: ALTO, side: "left" },
+                      { x1: 56, y1: 126, x2: 228, y2: 126, label: LARGO, side: "bottom" },
+                    ]}
+                  />
+                </div>
+              </article>
+            </Reveal>
+          )}
 
           {/* Tope lineal */}
           <Reveal y={14} delay={0.06}>
@@ -339,15 +341,19 @@ export default function GuiaMedicion() {
           </Reveal>
         </div>
 
-        {/* Tope en L: tres uniones */}
-        <Reveal y={14} className="mt-5">
-          <UnionsPanel id="guia-l" content={GUIA.enL} unions={UNIONS} viewBox="10 0 220 142" columns="md:grid-cols-3" />
-        </Reveal>
+        {MOSTRAR_COCINA && (
+          <>
+            {/* Tope en L: tres uniones */}
+            <Reveal y={14} className="mt-5">
+              <UnionsPanel id="guia-l" content={GUIA.enL} unions={UNIONS} viewBox="10 0 220 142" columns="md:grid-cols-3" />
+            </Reveal>
 
-        {/* Tope en U: dos uniones */}
-        <Reveal y={14} className="mt-5">
-          <UnionsPanel id="guia-u" content={GUIA.enU} unions={UNIONS_U} viewBox="12 0 272 142" columns="md:grid-cols-2" />
-        </Reveal>
+            {/* Tope en U: dos uniones */}
+            <Reveal y={14} className="mt-5">
+              <UnionsPanel id="guia-u" content={GUIA.enU} unions={UNIONS_U} viewBox="12 0 272 142" columns="md:grid-cols-2" />
+            </Reveal>
+          </>
+        )}
       </div>
     </section>
   );

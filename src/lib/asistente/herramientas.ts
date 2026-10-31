@@ -21,7 +21,7 @@ export const HERRAMIENTAS: Anthropic.Beta.BetaTool[] = [
         superficie: { ...texto, description: "Qué quiere proteger, por ejemplo 'mesa de comedor', 'mesa de centro', 'mesa auxiliar', 'repisa' o 'recibidor'" },
         material: { ...texto, description: "Material: mármol, cuarzo, granito, madera, porcelanato u otro" },
         medidas: { ...texto, description: "Medidas tal como las dio, con unidad, por ejemplo '240 x 90 cm'" },
-        sector: { ...texto, description: "Sector o ciudad" },
+        sector: { ...texto, description: "Ciudad y sector, por ejemplo 'Santo Domingo, Piantini'" },
         fecha_deseada: { ...texto, description: "Para cuándo lo necesita, en sus palabras" },
         notas: { ...texto, description: "Otro detalle útil para el vendedor" },
       },
@@ -31,14 +31,14 @@ export const HERRAMIENTAS: Anthropic.Beta.BetaTool[] = [
   },
   {
     name: "enviar_guia_medicion",
-    description: "Devuelve el enlace a la guía de la web para medir topes y mesas. Úsala si el cliente no sabe cómo medir.",
+    description: "Devuelve el enlace a la guía de la web para medir mesas y superficies. Úsala cada vez que pidas las medidas.",
     strict: true,
     input_schema: { type: "object", properties: {}, required: [], additionalProperties: false },
   },
   {
     name: "enviar_fotos_trabajos",
     description:
-      "Envía al cliente imágenes de referencia de Corazza. 'acabado': cómo se ve la lámina. 'cocina': una superficie protegida. 'kit': el kit de cuidado.",
+      "Envía al cliente imágenes de referencia de Corazza. 'acabado': cómo se ve la lámina. 'kit': el kit de cuidado.",
     strict: true,
     input_schema: {
       type: "object",

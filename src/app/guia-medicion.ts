@@ -8,6 +8,11 @@
 // src/app/components/guia/GuiaMedicion.tsx, junto a cada dibujo.
 // ============================================================================
 
+// Partes de cocina (backsplash, tope en L y tope en U): ocultas por ahora,
+// Corazza se enfoca en mesas, repisas y recibidores. Para volver a
+// mostrarlas, cambiar a true.
+export const MOSTRAR_COCINA = false;
+
 export const GUIA = {
   // Portada: "¿CÓMO / MEDIR / MI TOPE?" (MEDIR destacado).
   title: { before: "¿CÓMO", strong: "MEDIR", after: "MI TOPE?" },
