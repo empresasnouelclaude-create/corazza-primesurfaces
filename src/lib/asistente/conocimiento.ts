@@ -46,7 +46,7 @@ function fichaProducto(): string {
 /** Bloque de conocimiento que se incluye en las instrucciones del asistente. */
 export function conocimientoCorazza(): string {
   return `QUÉ ES CORAZZA
-Corazza Prime Surfaces protege superficies de alto valor con una lámina transparente que se aplica profesionalmente. ${SOLUCION.body}
+Corazza Prime protege superficies de alto valor con una lámina transparente que se aplica profesionalmente. ${SOLUCION.body}
 Lema: Protect · Preserve · Elevate.
 
 PRODUCTO DISPONIBLE
