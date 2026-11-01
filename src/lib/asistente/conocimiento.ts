@@ -93,6 +93,5 @@ PENDIENTE DE CONFIRMAR CON CORAZZA (no lo afirmes; dile al cliente que el equipo
 - Precios y rangos de precio.  TODO(dueño)
 - Zonas donde se instala y costo de traslado.  TODO(dueño)
 - Tiempo que dura la instalación.  TODO(dueño)
-- Horario de atención exacto del equipo.  TODO(dueño)
 - Premio y fecha del sorteo.  TODO(dueño)`;
 }

@@ -87,12 +87,15 @@ export async function responder({
   crear,
   modelo = MODELO_POR_DEFECTO,
   ahora = new Date(),
+  soloGuardar = false,
 }: {
   conversacion: Conversacion;
   entrada: Entrada;
   crear: CrearMensaje;
   modelo?: string;
   ahora?: Date;
+  /** true en horario laboral: se guarda el mensaje y responde la persona de ventas. */
+  soloGuardar?: boolean;
 }): Promise<Respuesta> {
   let conv: Conversacion = { ...conversacion, mensajes: [...conversacion.mensajes], actualizado: ahora.toISOString() };
   const respuestas: string[] = [];
@@ -105,7 +108,7 @@ export async function responder({
   if (esNueva && !soloSaludo) contenido.push({ type: "text", text: NOTA_PRIMER_MENSAJE });
   conv.mensajes.push({ role: "user", content: contenido });
   if (!conv.datos.nombre && entrada.nombrePerfil) conv.datos = { ...conv.datos, nombre: entrada.nombrePerfil };
-  if (conv.estado === "vendedor") return { conversacion: conv, respuestas, acciones };
+  if (conv.estado === "vendedor" || soloGuardar) return { conversacion: conv, respuestas, acciones };
   // Si el primer mensaje es solo un saludo, va la bienvenida fija y nada mas.
   // Si trae una pregunta, la IA saluda, responde y hace las preguntas (ver
   // PRIMER MENSAJE CON PREGUNTA en prompt.ts).

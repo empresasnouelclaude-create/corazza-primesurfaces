@@ -8,6 +8,7 @@
 import { after } from "next/server";
 import { AlmacenMemoria, AlmacenSupabase, type Almacen } from "@/lib/asistente/almacen.ts";
 import { configuracionIA } from "@/lib/asistente/ia.ts";
+import { enHorarioLaboral } from "@/lib/asistente/horario.ts";
 import { responder } from "@/lib/asistente/motor.ts";
 import {
   descargarImagen,
@@ -73,11 +74,14 @@ async function atender(
   ia: NonNullable<ReturnType<typeof configuracionIA>>,
   almacen: Almacen,
 ) {
-  await marcarLeido(cred, mensaje.id).catch(() => {});
+  // En horario laboral responde la persona de ventas desde la app (mismo
+  // numero): el asistente solo guarda el mensaje y no lo marca como leido.
+  const soloGuardar = enHorarioLaboral();
+  if (!soloGuardar) await marcarLeido(cred, mensaje.id).catch(() => {});
   const conversacion = await almacen.obtener(mensaje.de);
 
   if (mensaje.tipo === "otro") {
-    if (conversacion.estado === "asistente") {
+    if (conversacion.estado === "asistente" && !soloGuardar) {
       await enviarTexto(cred, mensaje.de, "Por ahora puedo leer mensajes de texto y fotos. ¿Me lo escribes, por favor?");
     }
     return;
@@ -89,6 +93,7 @@ async function atender(
     entrada: { texto: mensaje.texto, imagen, nombrePerfil: mensaje.nombrePerfil },
     crear: ia.crear,
     modelo: ia.modelo,
+    soloGuardar,
   });
   await almacen.guardar(actualizada);
 

@@ -3,6 +3,7 @@
 // con los dueños. Cambiar aqui el tono o las reglas no requiere tocar el
 // resto del codigo.
 import { GUIA_MEDICION_URL, conocimientoCorazza } from "./conocimiento.ts";
+import { textoHorario } from "./horario.ts";
 
 /**
  * Primer mensaje de cada conversacion nueva, con las preguntas separadas por
@@ -89,7 +90,7 @@ FOTOS Y MEDIDAS (que el cliente no se agobie)
 REGLAS
 - No des precios ni rangos: el vendedor envía la cotización el mismo día en horario laboral. Si insisten, explica que depende de las medidas y la superficie. Puedes mencionar los descuentos de tu información, sin calcular montos.
 - No prometas fechas, zonas ni tiempos de instalación: el equipo los confirma.
-- Atiendes a cualquier hora. Si escriben de noche o fuera de horario, recoge los datos igual y di que el equipo le escribe a primera hora.
+- Solo atiendes fuera del horario laboral del equipo (${textoHorario()}). Dentro de ese horario responde una persona de ventas. Cuando pases el caso, di que el equipo le escribe en cuanto abra, a primera hora.
 - No inventes nada. Si no sabes algo o no está en tu información, di que lo consultas con el equipo.
 - Si te preguntan si eres una persona o un bot, di con naturalidad que eres el asistente virtual de Corazza y ofrece pasar la conversación a alguien del equipo.
 - Usa pasar_a_vendedor cuando:
