@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useId, useReducer, useRef, useState } from "react";
 import { DIMENSION_LABELS, ERRORS, PRICE_ERRORS, PROVINCIAS, SHAPES, TEXT, UNITS } from "./config.ts";
 import { MARGIN_MAX, MARGIN_MIN, SHAPE_DIMENSIONS, format2, formatRD, ft2ToM2, parsePositive } from "./formulas.ts";
+import FichasClientes, { TIPO_ARRASTRE, datosDeFicha, type Ficha } from "./FichasClientes";
 import Reporte, { itemMeasures, shapeLabel } from "./Reporte";
 import { initialState, reducer, totals } from "./state.ts";
 
@@ -95,6 +96,22 @@ export default function Calculadora() {
     }
   }
 
+  const [soltando, setSoltando] = useState(false);
+
+  function usarFicha(f: Ficha) {
+    const datos = datosDeFicha(f);
+    const hasData = state.items.length > 0 || state.client.trim() !== "";
+    if (hasData && !window.confirm("¿Reemplazar los datos actuales con esta ficha?")) return;
+    dispatch({ type: "reset" });
+    dispatch({ type: "prefill", ...datos });
+    const agregadas = datos.surfaces.filter((s) => s.unit).length;
+    setAnnouncement(
+      `Ficha de ${datos.client}: ${agregadas} superficie${agregadas === 1 ? "" : "s"} agregada${agregadas === 1 ? "" : "s"}.` +
+        (datos.surfaces.length > agregadas ? " Revisa la unidad de las medidas pendientes." : "") +
+        (datos.surfaces.length === 0 ? " No se entendieron las medidas: escríbelas abajo." : ""),
+    );
+  }
+
   function reset() {
     const hasData = state.items.length > 0 || state.client.trim() !== "" || state.priceInput.trim() !== "";
     if (hasData && !window.confirm(TEXT.confirmReset)) return;
@@ -125,7 +142,30 @@ export default function Calculadora() {
         {announcement}
       </p>
 
-      <main className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
+      <main
+        className={`mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10 ${soltando ? "rounded-3xl outline-dashed outline-2 outline-offset-4 outline-corazza-taupe" : ""}`}
+        onDragOver={(e) => {
+          if (!e.dataTransfer.types.includes(TIPO_ARRASTRE)) return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "copy";
+          setSoltando(true);
+        }}
+        onDragLeave={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) setSoltando(false);
+        }}
+        onDrop={(e) => {
+          const texto = e.dataTransfer.getData(TIPO_ARRASTRE);
+          setSoltando(false);
+          if (!texto) return;
+          e.preventDefault();
+          try {
+            usarFicha(JSON.parse(texto) as Ficha);
+          } catch {}
+        }}
+      >
+        <div className="mb-6">
+          <FichasClientes onUsar={usarFicha} />
+        </div>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
           <div className="flex flex-col gap-6 lg:col-span-7">
             {/* Cliente */}

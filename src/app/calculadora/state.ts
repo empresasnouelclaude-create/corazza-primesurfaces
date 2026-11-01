@@ -1,6 +1,7 @@
 // Estado de la Calculadora Corazza como reducer puro (sin React), para
 // poder probarlo con `npm test` igual que las formulas.
 import { DEFAULT_SHAPE, DEFAULT_UNIT, TEXT } from "./config.ts";
+import type { SuperficieLeida } from "./medidas.ts";
 import {
   MARGIN_DEFAULT,
   SHAPE_DIMENSIONS,
@@ -74,7 +75,8 @@ export type Action =
   | { type: "transportOn"; value: boolean }
   | { type: "province"; value: string }
   | { type: "transport"; value: string }
-  | { type: "generate"; date: Date };
+  | { type: "generate"; date: Date }
+  | { type: "prefill"; client: string; surfaces: SuperficieLeida[]; province: string | null };
 
 export function initialState(): State {
   return {
@@ -207,6 +209,26 @@ export function reducer(state: State, action: Action): State {
       return invalidate({ ...state, province: action.value });
     case "transport":
       return invalidate({ ...state, transportInput: action.value });
+    case "prefill": {
+      // Ficha de un cliente (WhatsApp) arrastrada a la calculadora: cliente y
+      // superficies con unidad se agregan solas; la primera sin unidad queda
+      // en el formulario para completarla. Precio y transporte son manuales.
+      let next: State = { ...state, client: action.client || state.client, province: action.province ?? state.province };
+      const pendientes: SuperficieLeida[] = [];
+      for (const s of action.surfaces) {
+        if (!s.unit) {
+          pendientes.push(s);
+          continue;
+        }
+        next = reducer(
+          { ...next, description: s.description, shape: s.shape, unit: s.unit, dimInputs: s.dims, dimErrors: {} },
+          { type: "add" },
+        );
+      }
+      const p = pendientes[0];
+      if (p) next = { ...next, description: p.description, shape: p.shape, dimInputs: p.dims, dimErrors: {} };
+      return invalidate(next);
+    }
     case "generate": {
       if (state.items.length === 0) return state;
       return { ...state, reportStale: false, report: buildReport(state, action.date) };
