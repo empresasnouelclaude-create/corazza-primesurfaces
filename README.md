@@ -34,6 +34,7 @@ un reporte en pantalla. Sigue "Especificaciones Calculadora Corazza" v1.0.
   landing y está excluida de Google con `noindex`).
 - No tiene contraseña: cualquiera con el enlace puede abrirla. No guarda
   datos en ningún servidor; si se recarga la página, se pierde lo escrito.
+- La cotización se calcula sobre el **film recomendado** (área total + margen). En el reporte para el cliente solo aparecen el área total y el monto; el margen y el film son internos. Si se cambia el margen o el precio después de generar el reporte, se actualiza solo.
 - Fórmulas: `src/app/calculadora/formulas.ts`. Textos y opciones:
   `src/app/calculadora/config.ts`. Estado (agregar, borrar, reset, reporte):
   `src/app/calculadora/state.ts`.

@@ -96,14 +96,30 @@ export function totals(state: State) {
     totalFt2: total,
     filmFt2: filmFt2(total, state.margin),
     pricePerFt2: price,
-    quote: price === null ? null : quote(total, price),
+    quote: price === null ? null : quote(total, price, state.margin),
   };
 }
 
-// Cualquier cambio en los datos del reporte (cliente, medidas, margen o
-// precio) lo invalida: se oculta hasta generarlo de nuevo.
+function buildReport(state: State, date: Date): Report {
+  const t = totals(state);
+  return {
+    date,
+    client: state.client.trim(),
+    items: state.items,
+    totalFt2: t.totalFt2,
+    margin: state.margin,
+    filmFt2: t.filmFt2,
+    pricePerFt2: t.pricePerFt2,
+    quote: t.quote,
+  };
+}
+
+// Si ya hay un reporte y cambian los datos (cliente, medidas, margen o
+// precio), el reporte se actualiza solo. Si ya no quedan medidas, se oculta.
 function invalidate(state: State): State {
-  return state.report ? { ...state, report: null, reportStale: true } : state;
+  if (!state.report) return state;
+  if (state.items.length === 0) return { ...state, report: null, reportStale: true };
+  return { ...state, report: buildReport(state, state.report.date) };
 }
 
 export function reducer(state: State, action: Action): State {
@@ -161,21 +177,7 @@ export function reducer(state: State, action: Action): State {
       return invalidate({ ...state, priceInput: action.value });
     case "generate": {
       if (state.items.length === 0) return state;
-      const t = totals(state);
-      return {
-        ...state,
-        reportStale: false,
-        report: {
-          date: action.date,
-          client: state.client.trim(),
-          items: state.items,
-          totalFt2: t.totalFt2,
-          margin: state.margin,
-          filmFt2: t.filmFt2,
-          pricePerFt2: t.pricePerFt2,
-          quote: t.quote,
-        },
-      };
+      return { ...state, reportStale: false, report: buildReport(state, action.date) };
     }
   }
 }
