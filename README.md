@@ -83,6 +83,8 @@ Variables de entorno (Vercel → Settings → Environment Variables):
 | `WHATSAPP_PHONE_NUMBER_ID` | ID del número de WhatsApp de Corazza |
 | `WHATSAPP_VERIFY_TOKEN` | Texto que se escribe en Meta al configurar el webhook |
 | `WHATSAPP_APP_SECRET` | Secreto de la app de Meta (para comprobar que los avisos vienen de Meta) |
+| `WHATSAPP_WABA_ID` | ID de la cuenta de WhatsApp Business (para las plantillas del panel) |
+| `WHATSAPP_FLOTA1_PHONE_NUMBER_ID` | ID del número del técnico (Flota 1), para escribir desde el panel |
 
 ## Panel: documentos de Citrus (`/panel/documentos`)
 
@@ -92,6 +94,16 @@ Corazza cotiza y factura en **Citrus ERP**. El panel no crea cotizaciones ni fac
 - Totales y unión de documentos: `src/lib/citrus/resumen.ts`. Si el mismo número de factura llega en otro PDF (por ejemplo el reporte de cuentas por cobrar), se actualiza su saldo.
 - Variables: `PANEL_CLAVE` (clave de la página) y `ANTHROPIC_API_KEY`.
 - PDF de hasta 3 MB. Con la base de datos conectada, los documentos y los PDF quedan guardados en Supabase; sin ella, el panel funciona en **modo de prueba** (datos solo en el navegador).
+
+## Panel: WhatsApp (`/panel/whatsapp`)
+
+Escribir a un cliente desde el número de Corazza o el del técnico (Flota 1). Pide la clave `PANEL_CLAVE`.
+
+- Los números están en `src/lib/panel/remitentes.ts`. Para agregar otro (Flota 2…), se agrega ahí con su variable.
+- **Mensaje libre:** solo llega si el cliente escribió a ese número en las últimas 24 horas. Para escribir primero hay que usar una **plantilla** aprobada en WhatsApp Manager (por ahora el panel llena las variables del cuerpo; plantillas con imagen o variables en el encabezado salen como "no compatible").
+- El asistente de IA solo responde en el número principal; los mensajes que llegan al número del técnico los responde él desde su app (coexistencia).
+- Con la base de datos conectada, se guarda el historial y el estado de cada envío (entregado, leído, no entregado).
+- Desde **Documentos**, si la factura o cotización trae teléfono, el botón "Escribir por WhatsApp" abre esta herramienta con el cliente.
 
 ## Base de datos (Supabase)
 

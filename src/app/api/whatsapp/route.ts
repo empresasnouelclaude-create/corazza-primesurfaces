@@ -16,13 +16,16 @@ import {
   enviarImagen,
   enviarTexto,
   firmaValida,
+  leerEstados,
   leerLlamadas,
   leerMensajes,
   marcarLeido,
   verificarSuscripcion,
   type CredencialesWhatsApp,
+  type EstadoEnvio,
   type MensajeEntrante,
 } from "@/lib/asistente/whatsapp.ts";
+import { atiendeAsistente } from "@/lib/panel/remitentes.ts";
 import { baseDeDatos } from "@/lib/supabase.ts";
 
 const memoria = new AlmacenMemoria();
@@ -53,12 +56,17 @@ export async function POST(request: Request) {
   if (!cred || !ia) return new Response("Asistente sin configurar", { status: 503 });
 
   const aviso = JSON.parse(cuerpo);
-  const mensajes = leerMensajes(aviso);
-  const llamadas = leerLlamadas(aviso);
+  // Solo se atienden los mensajes del numero principal; los de otros numeros
+  // (por ejemplo, el del tecnico) los responde esa persona desde su app.
+  const mensajes = leerMensajes(aviso).filter((m) => atiendeAsistente(m.para));
+  const llamadas = leerLlamadas(aviso).filter((l) => atiendeAsistente(l.para));
+  const estados = leerEstados(aviso);
   const guardado = elegirAlmacen();
 
   // Se responde 200 enseguida (Meta lo exige) y se atiende despues.
   after(async () => {
+    // Estado de los mensajes enviados desde el panel (entregado, leido, fallido).
+    if (estados.length) await actualizarEnvios(estados).catch((e) => console.error("Estados de WhatsApp:", e));
     for (const mensaje of mensajes) {
       try {
         // Meta puede reenviar el mismo aviso; se ignoran los ya atendidos.
@@ -124,5 +132,28 @@ async function atender(
       // PENDIENTE: aviso al vendedor (correo o WhatsApp) cuando exista el panel.
       console.info("Caso para el vendedor:", mensaje.de, accion.motivo, accion.resumen);
     }
+  }
+}
+
+// Un estado solo reemplaza a uno anterior (enviado -> entregado -> leido);
+// "fallido" reemplaza a cualquiera. Meta puede mandarlos desordenados.
+const ANTERIORES: Record<EstadoEnvio["estado"], string[]> = {
+  enviado: [],
+  entregado: ["enviado"],
+  leido: ["enviado", "entregado"],
+  fallido: ["enviado", "entregado", "leido"],
+};
+
+async function actualizarEnvios(estados: EstadoEnvio[]) {
+  const db = baseDeDatos();
+  if (!db) return;
+  for (const e of estados) {
+    if (!ANTERIORES[e.estado].length) continue;
+    const { error } = await db
+      .from("envios_whatsapp")
+      .update({ estado: e.estado, error: e.error })
+      .eq("wamid", e.wamid)
+      .in("estado", ANTERIORES[e.estado]);
+    if (error) throw error;
   }
 }
