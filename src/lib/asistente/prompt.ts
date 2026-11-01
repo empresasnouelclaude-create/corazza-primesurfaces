@@ -11,10 +11,9 @@ import { GUIA_MEDICION_URL, conocimientoCorazza } from "./conocimiento.ts";
 export const MENSAJE_BIENVENIDA = [
   "Hola soy el asistente virtual de Corazza Prime.✨ Por favor, respóndenos las siguientes preguntas para poder pasarte con nuestro equipo de ventas😊",
   "1. ¿Qué quieres proteger? Mesa de comedor, mesa de centro, mesa auxiliar, repisa o recibidor en superficie de piedra.",
-  "2. ¿En qué ciudad estás?",
-  "3. ¿En qué sector?",
-  `4. ¿Cuáles son las medidas aproximadas? Aquí te explicamos cómo medir: ${GUIA_MEDICION_URL}`,
-  "5. Envíanos una foto de la superficie.",
+  "2. Ciudad / Sector",
+  `3. ¿Cuáles son las medidas aproximadas? Aquí te explicamos cómo medir: ${GUIA_MEDICION_URL}`,
+  "4. Envíanos una foto de la superficie.",
 ].join("\n\n");
 
 export function instruccionesAsistente(): string {
