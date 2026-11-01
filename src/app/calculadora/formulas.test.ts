@@ -58,13 +58,15 @@ test("dos superficies se suman sin redondeo intermedio", () => {
   close(totalFt2([a, b]), a + b);
 });
 
-test("precio RD$800/ft² para 183 x 100 cm ≈ RD$15,758.36 (sobre area sin redondear, sin margen)", () => {
+test("cotizacion sobre el film recomendado: 183 x 100 cm a RD$800/ft²", () => {
   const a = areaFt2("rectangular", { largo: 183, ancho: 100 }, "cm");
-  // La especificacion dice "aproximadamente RD$15,758.03"; el valor exacto
-  // con su formula (19.697956... x 800) es 15,758.36.
-  assert.equal(formatRD(quote(a, 800)), "RD$15,758.36");
-  // Con el area ya redondeada (19.70 x 800) daria 15,760.00: no es lo que se pide.
-  assert.notEqual(formatRD(quote(a, 800)), "RD$15,760.00");
+  // Sin margen: 19.697956... x 800 = 15,758.36 (sobre el area sin redondear).
+  assert.equal(formatRD(quote(a, 800, 0)), "RD$15,758.36");
+  assert.notEqual(formatRD(quote(a, 800, 0)), "RD$15,760.00");
+  // Con 10% de margen: 19.697956... x 1.10 x 800 = 17,334.20.
+  assert.equal(formatRD(quote(a, 800, 10)), "RD$17,334.20");
+  // Sube con el margen.
+  assert.ok(quote(a, 800, 20) > quote(a, 800, 10));
 });
 
 test("margen ajustable de 0 a 30", () => {

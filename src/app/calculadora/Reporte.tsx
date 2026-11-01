@@ -91,32 +91,16 @@ export default function Reporte({ report }: { report: Report }) {
             <dt>{TEXT.totalArea} (m²)</dt>
             <dd className="tabular-nums">{format2(ft2ToM2(report.totalFt2))} m²</dd>
           </div>
-          <div className="flex justify-between gap-4 py-2.5">
-            <dt>{TEXT.margin}</dt>
-            <dd className="tabular-nums">{report.margin}%</dd>
-          </div>
-          <div className="flex justify-between gap-4 py-2.5">
-            <dt>{TEXT.film}</dt>
-            <dd className="font-semibold tabular-nums">{format2(report.filmFt2)} ft²</dd>
-          </div>
-          {report.pricePerFt2 !== null && report.quote !== null && (
-            <>
-              <div className="flex justify-between gap-4 py-2.5">
-                <dt>{TEXT.unitPrice}</dt>
-                <dd className="tabular-nums">{formatRD(report.pricePerFt2)}</dd>
-              </div>
-              <div className="flex items-baseline justify-between gap-4 py-3">
-                <dt className="font-semibold">{TEXT.quote}</dt>
-                <dd className="font-corazza-serif text-2xl font-medium tabular-nums [font-variant-numeric:lining-nums_tabular-nums]">{formatRD(report.quote)}</dd>
-              </div>
-            </>
+          {/* Para el cliente: area total y monto. El margen, el film y el
+              precio por ft² son internos y no se muestran (el monto se
+              calcula sobre el film, ver formulas.ts). */}
+          {report.quote !== null && (
+            <div className="flex items-baseline justify-between gap-4 py-3">
+              <dt className="font-semibold">{TEXT.quote}</dt>
+              <dd className="font-corazza-serif text-2xl font-medium tabular-nums [font-variant-numeric:lining-nums_tabular-nums]">{formatRD(report.quote)}</dd>
+            </div>
           )}
         </dl>
-
-        <p className="mt-6 font-corazza-sans text-xs leading-relaxed text-corazza-charcoal/80">
-          {TEXT.filmNote}
-          {report.quote !== null && ` ${TEXT.quoteNote}`}
-        </p>
       </div>
     </article>
   );

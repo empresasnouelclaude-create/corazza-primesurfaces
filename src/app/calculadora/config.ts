@@ -80,7 +80,8 @@ export const TEXT = {
   quote: "Cotización estimada",
   filmNote:
     "El film recomendado es una estimación por área: no garantiza el aprovechamiento de los rollos, la orientación de los cortes ni los anchos disponibles.",
-  quoteNote: "La cotización se calcula sobre el área total real, sin margen.",
+  quoteNote:
+    "La cotización se calcula sobre el film recomendado (área total + margen). En el reporte del cliente solo aparecen el área total y el monto, sin el margen.",
   generate: "Generar reporte",
   generateDisabled: "Agrega al menos una superficie para generar el reporte.",
   reportTitle: "Reporte de medidas",
@@ -91,6 +92,6 @@ export const TEXT = {
   reportShape: "Forma",
   reportMeasures: "Medidas",
   reportArea: "Área",
-  reportStale: "Los datos cambiaron. Genera el reporte de nuevo para verlo actualizado.",
+  reportStale: "Agrega al menos una superficie para volver a generar el reporte.",
   surfacesCount: (n: number) => (n === 1 ? "1 superficie" : `${n} superficies`),
 } as const;

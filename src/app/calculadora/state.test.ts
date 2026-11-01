@@ -59,7 +59,7 @@ test("dos superficies se suman; precio y film segun la especificacion", () => {
   const t = totals(s);
   assert.equal(t.totalFt2.toFixed(4), (19.697956 + 2.690978).toFixed(4));
   assert.equal(t.filmFt2.toFixed(4), ((19.697956 + 2.690978) * 1.1).toFixed(4));
-  assert.equal(t.quote?.toFixed(2), ((19.6979560626 + 2.6909776042) * 800).toFixed(2));
+  assert.equal(t.quote?.toFixed(2), ((19.6979560626 + 2.6909776042) * 1.1 * 800).toFixed(2));
 });
 
 test("eliminar una superficie y borrar todas", () => {
@@ -93,8 +93,16 @@ test("reporte: deshabilitado sin superficies; se invalida al editar datos", () =
   // Escribir la proxima medida no invalida el reporte...
   s = reducer(s, { type: "dim", dim: "largo", value: "50" });
   assert.ok(s.report);
-  // ...pero cambiar el margen, el precio, el cliente o la lista si.
+  // ...y cambiar el margen o el precio lo actualiza solo (misma fecha).
+  s = reducer(s, { type: "price", value: "800" });
+  const conDiez = s.report?.quote ?? 0;
   s = reducer(s, { type: "margin", value: 15 });
+  assert.ok(s.report);
+  assert.equal(s.report?.date, DATE);
+  assert.equal(s.report?.margin, 15);
+  assert.ok((s.report?.quote ?? 0) > conDiez, "la cotizacion sube con el margen");
+  // Si se borran todas las medidas, el reporte se oculta.
+  s = reducer(s, { type: "clearItems" });
   assert.equal(s.report, null);
   assert.equal(s.reportStale, true);
 });

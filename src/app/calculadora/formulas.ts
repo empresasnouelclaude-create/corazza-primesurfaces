@@ -9,7 +9,10 @@
 // - Todo se convierte a pies antes de calcular el area.
 // - Las areas se suman SIN redondear; el redondeo (2 decimales) es solo
 //   para mostrar.
-// - El film recomendado lleva margen; la cotizacion NO (precio x area real).
+// - El film recomendado lleva margen y la cotizacion se calcula sobre el
+//   film recomendado (precio x film). Pedido de los dueños (nov. 2026):
+//   cambia la especificacion v1.0, que cotizaba sobre el area real. Al
+//   cliente se le muestra el area total y el monto, no el margen ni el film.
 // ============================================================================
 
 export type Unit = "cm" | "in" | "ft" | "m";
@@ -75,9 +78,9 @@ export function filmFt2(total: number, margin: number): number {
   return total * (1 + clampMargin(margin) / 100);
 }
 
-/** Cotizacion = area total REAL x precio por ft² (sin margen). */
-export function quote(total: number, pricePerFt2: number): number {
-  return total * pricePerFt2;
+/** Cotizacion = film recomendado (area total + margen) x precio por ft². */
+export function quote(total: number, pricePerFt2: number, margin: number): number {
+  return filmFt2(total, margin) * pricePerFt2;
 }
 
 // --- Validacion de numeros -------------------------------------------------
