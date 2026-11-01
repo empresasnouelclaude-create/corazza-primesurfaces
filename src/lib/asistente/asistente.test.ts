@@ -170,9 +170,20 @@ test("motor: la bienvenida fija sale solo en el primer mensaje", async () => {
   const { responder } = await import("./motor.ts");
   const { nuevaConversacion } = await import("./tipos.ts");
   const texto = (t: string) => ({ stop_reason: "end_turn" as const, content: [{ type: "text" as const, text: t, citations: null }] });
-  const { crear } = iaFalsa([texto("¿Qué te gustaría proteger?"), texto("¿Me envías una foto?")]);
+  const { crear, llamadas } = iaFalsa([texto("¿Me envías una foto?")]);
   const r1 = await responder({ conversacion: nuevaConversacion("1809"), entrada: { texto: "Hola" }, crear });
-  assert.deepEqual(r1.respuestas, [MENSAJE_BIENVENIDA, "¿Qué te gustaría proteger?"]);
+  assert.deepEqual(r1.respuestas, [MENSAJE_BIENVENIDA], "si solo saluda, basta con la bienvenida");
+  assert.equal(llamadas.length, 0);
   const r2 = await responder({ conversacion: r1.conversacion, entrada: { texto: "Mi mesa de comedor" }, crear });
   assert.deepEqual(r2.respuestas, ["¿Me envías una foto?"]);
+});
+
+test("solo saludo: reconoce saludos y palabras clave, no preguntas reales", async () => {
+  const { esSoloSaludo } = await import("./motor.ts");
+  for (const t of ["Hola", "Buenas tardes!", "INFO", "PRECIO", "Hola, buenos días. Info por favor", "Holaa 👋"]) {
+    assert.equal(esSoloSaludo({ texto: t }), true, t);
+  }
+  for (const t of ["¿Cómo se ve?", "Hola, tengo una mesa de mármol", "Mi nombre es Ana", "...", ""]) {
+    assert.equal(esSoloSaludo({ texto: t }), false, t);
+  }
 });
