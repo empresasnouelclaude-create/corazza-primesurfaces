@@ -10,7 +10,7 @@ import { GUIA_MEDICION_URL, conocimientoCorazza } from "./conocimiento.ts";
  */
 export const MENSAJE_BIENVENIDA = [
   "Hola soy el asistente virtual de Corazza Prime.✨ Por favor, respóndenos las siguientes preguntas para poder pasarte con nuestro equipo de ventas😊",
-  "1. Nombre",
+  "1. ¿Cuál es tu nombre?",
   "2. ¿Qué quieres proteger? Mesa de comedor, mesa de centro, mesa auxiliar, repisa o recibidor en superficie de piedra.",
   "3. Ciudad / Sector",
   `4. ¿Cuáles son las medidas aproximadas? Aquí te explicamos cómo medir: ${GUIA_MEDICION_URL}`,
