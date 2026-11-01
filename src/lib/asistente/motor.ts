@@ -64,6 +64,23 @@ export function parametrosIA(conversacion: Conversacion, modelo: string): Parame
   };
 }
 
+// Palabras de un primer mensaje que solo saluda o pide informacion
+// ("Hola", "Buenas tardes", "Info", "PRECIO"...). Si el primer mensaje es
+// solo eso, basta con la bienvenida: la IA no responde aparte.
+const SOLO_SALUDO = new Set(
+  "hola holaa buenas buenos buen dia dias tardes noches saludos hey hi hello que tal como estas esta estan info informacion precio precios corazza prime me interesa quiero mas por favor gracias ok y".split(" "),
+);
+
+export function esSoloSaludo(entrada: Entrada): boolean {
+  if (entrada.imagen) return false;
+  const palabras = (entrada.texto ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .match(/[a-z0-9]+/g);
+  return !!palabras && palabras.every((p) => SOLO_SALUDO.has(p));
+}
+
 export async function responder({
   conversacion,
   entrada,
@@ -87,7 +104,10 @@ export async function responder({
   if (!conv.datos.nombre && entrada.nombrePerfil) conv.datos = { ...conv.datos, nombre: entrada.nombrePerfil };
   if (conv.estado === "vendedor") return { conversacion: conv, respuestas, acciones };
   // Bienvenida fija al empezar una conversacion (la IA sigue con la primera pregunta).
-  if (esNueva) respuestas.push(MENSAJE_BIENVENIDA);
+  if (esNueva) {
+    respuestas.push(MENSAJE_BIENVENIDA);
+    if (esSoloSaludo(entrada)) return { conversacion: conv, respuestas, acciones };
+  }
 
   for (let vuelta = 0; vuelta < MAX_VUELTAS; vuelta++) {
     const respuesta = await crear(parametrosIA(conv, modelo));
