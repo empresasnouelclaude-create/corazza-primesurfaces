@@ -163,7 +163,7 @@ test("whatsapp: lee texto e imagen con el nombre del perfil e ignora estados", (
   };
   const m = leerMensajes(aviso);
   assert.equal(m.length, 2);
-  assert.deepEqual(m[0], { id: "m1", de: "18095550142", nombrePerfil: "Patricia", tipo: "texto", texto: "Hola", mediaId: null });
+  assert.deepEqual(m[0], { id: "m1", para: null, de: "18095550142", nombrePerfil: "Patricia", tipo: "texto", texto: "Hola", mediaId: null });
   assert.equal(m[1].mediaId, "media1");
   assert.equal(m[1].texto, "Mi mesa");
 });
@@ -242,6 +242,40 @@ test("whatsapp: detecta las llamadas que inicia el cliente (solo el inicio)", as
       { id: "c2", from: "18095550143", event: "connect", direction: "BUSINESS_INITIATED" },
     ] } }] }],
   };
-  assert.deepEqual(leerLlamadas(aviso), [{ id: "c1", de: "18095550142" }]);
+  assert.deepEqual(leerLlamadas(aviso), [{ id: "c1", de: "18095550142", para: null }]);
   assert.deepEqual(leerLlamadas({}), []);
+});
+
+test("panel whatsapp: teléfonos, plantillas, estados y a qué número responde el asistente", async () => {
+  const { normalizarTelefono, leerPlantillas, contarVariables, leerEstados } = await import("./whatsapp.ts");
+  const { atiendeAsistente } = await import("../panel/remitentes.ts");
+  assert.equal(normalizarTelefono("(809) 555-0142"), "18095550142");
+  assert.equal(normalizarTelefono("+1 849 260 4759"), "18492604759");
+  assert.equal(normalizarTelefono("555-0142"), null);
+  assert.equal(contarVariables("Hola {{1}}, tu cita es el {{2}}"), 2);
+
+  const p = leerPlantillas({
+    data: [
+      { name: "cita", language: "es", status: "APPROVED", category: "UTILITY", components: [{ type: "BODY", text: "Hola {{1}}, el {{2}}" }] },
+      { name: "pendiente", language: "es", status: "PENDING", components: [] },
+      { name: "con_foto", language: "es", status: "APPROVED", components: [{ type: "HEADER", format: "IMAGE" }, { type: "BODY", text: "Hola" }] },
+    ],
+  });
+  assert.deepEqual(p.map((x) => [x.nombre, x.variables, x.compatible]), [["cita", 2, true], ["con_foto", 0, false]]);
+
+  const estados = leerEstados({
+    entry: [{ changes: [{ value: { statuses: [
+      { id: "w1", status: "delivered" },
+      { id: "w2", status: "failed", errors: [{ code: 131047, title: "Re-engagement message" }] },
+    ] } }] }],
+  });
+  assert.equal(estados[0].estado, "entregado");
+  assert.equal(estados[1].estado, "fallido");
+  assert.match(estados[1].error!, /24 horas/);
+
+  const env = { WHATSAPP_PHONE_NUMBER_ID: "111", WHATSAPP_FLOTA1_PHONE_NUMBER_ID: "222" };
+  assert.equal(atiendeAsistente("111", env), true);
+  assert.equal(atiendeAsistente("222", env), false, "el asistente no responde en el número del técnico");
+  assert.equal(atiendeAsistente(null, env), true);
+  assert.equal(atiendeAsistente("999", env), false);
 });

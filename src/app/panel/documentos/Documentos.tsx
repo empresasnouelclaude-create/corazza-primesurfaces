@@ -274,7 +274,15 @@ export default function Documentos() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-3">
           <div>
             <p className="font-corazza-serif text-2xl font-semibold tracking-[0.14em]">CORAZZA</p>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-corazza-cream">Panel · Documentos de Citrus</p>
+            <nav aria-label="Panel" className="mt-0.5 flex gap-3 text-[11px] uppercase tracking-[0.2em] text-corazza-cream">
+              <span aria-current="page" className="text-corazza-white">
+                Documentos
+              </span>
+              <span aria-hidden>·</span>
+              <a href="/panel/whatsapp" className="hover:text-corazza-white">
+                WhatsApp
+              </a>
+            </nav>
           </div>
           <form
             className="flex items-center gap-2"
@@ -500,6 +508,14 @@ export default function Documentos() {
                     ))}
                 </dl>
                 {detalle.ncf && <p className="text-xs text-corazza-taupe">NCF: {detalle.ncf}</p>}
+                {detalle.cliente.telefono && (
+                  <a
+                    href={`/panel/whatsapp?tel=${encodeURIComponent(detalle.cliente.telefono)}&nombre=${encodeURIComponent(detalle.cliente.nombre ?? "")}`}
+                    className="inline-flex min-h-[40px] items-center rounded-lg border border-corazza-charcoal/15 px-3 text-sm font-semibold hover:bg-corazza-cream/40"
+                  >
+                    Escribir por WhatsApp
+                  </a>
+                )}
                 {detalle.notas && <p className="text-xs text-corazza-taupe">{detalle.notas}</p>}
                 <p className="text-xs text-corazza-taupe">
                   Leído de: {detalle.archivo}

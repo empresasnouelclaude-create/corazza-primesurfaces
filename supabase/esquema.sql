@@ -45,3 +45,19 @@ alter table inventario_citrus enable row level security;
 insert into storage.buckets (id, name, public)
 values ('citrus', 'citrus', false)
 on conflict (id) do nothing;
+
+-- Mensajes enviados desde el panel (herramienta "WhatsApp" del panel).
+create table if not exists envios_whatsapp (
+  id uuid primary key default gen_random_uuid(),
+  remitente text not null,                 -- 'corazza', 'flota1'…
+  para text not null,                      -- telefono del cliente
+  nombre text,                             -- nombre del cliente (opcional)
+  tipo text not null,                      -- 'texto' | 'plantilla'
+  contenido text not null,                 -- texto enviado o nombre de la plantilla
+  wamid text,                              -- id del mensaje en WhatsApp
+  estado text not null default 'enviado',  -- enviado | entregado | leido | fallido
+  error text,                              -- motivo si fallo
+  creado timestamptz not null default now()
+);
+create index if not exists envios_whatsapp_wamid on envios_whatsapp (wamid);
+alter table envios_whatsapp enable row level security;
