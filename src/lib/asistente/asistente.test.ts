@@ -90,10 +90,19 @@ test("parametros: con Sonnet u Opus se pide el modelo de respaldo", () => {
   assert.deepEqual(p.betas, ["server-side-fallback-2026-07-01"]);
 });
 
-test("motor: con la conversacion en manos del vendedor, guarda el mensaje pero no llama a la IA", async () => {
+test("motor: caso ya en ventas, fuera de horario responde la IA con la nota del caso", async () => {
+  const conv = { ...nuevaConversacion("1"), estado: "vendedor" as const, mensajes: [{ role: "user" as const, content: "hola" }] };
+  const { crear, llamadas } = iaFalsa([{ stop_reason: "end_turn", content: [{ type: "text", text: "El equipo te escribe a primera hora.", citations: null }] }]);
+  const r = await responder({ conversacion: conv, entrada: { texto: "¿Ya me cotizaron?" }, crear });
+  assert.deepEqual(r.respuestas, ["El equipo te escribe a primera hora."]);
+  assert.match(JSON.stringify(llamadas[0].messages.at(-1)), /ya se pasó al equipo de ventas/);
+  assert.equal(r.conversacion.estado, "vendedor");
+});
+
+test("motor: caso ya en ventas, en horario laboral no responde", async () => {
   const conv = { ...nuevaConversacion("1"), estado: "vendedor" as const };
   const { crear, llamadas } = iaFalsa([]);
-  const r = await responder({ conversacion: conv, entrada: { texto: "¿Ya me cotizaron?" }, crear });
+  const r = await responder({ conversacion: conv, entrada: { texto: "¿Ya me cotizaron?" }, crear, soloGuardar: true });
   assert.equal(llamadas.length, 0);
   assert.equal(r.respuestas.length, 0);
   assert.equal(r.conversacion.mensajes.length, 1);
@@ -201,16 +210,17 @@ test("motor: si el primer mensaje trae una pregunta, no va la bienvenida fija y 
 
 test("horario: el asistente solo atiende fuera del horario laboral (hora de RD)", async () => {
   const { enHorarioLaboral, textoHorario } = await import("./horario.ts");
-  const h = { 1: [["08:30", "17:30"]] as [string, string][] };
+  const h = { 1: [["09:00", "17:00"]] as [string, string][] };
   // Lunes 3 nov 2026: 10:00 en RD = 14:00 UTC
   assert.equal(enHorarioLaboral(new Date("2026-11-02T14:00:00Z"), h), true);
   // Lunes 20:00 en RD = martes 00:00 UTC
   assert.equal(enHorarioLaboral(new Date("2026-11-03T00:00:00Z"), h), false);
-  // Lunes 08:29 en RD
-  assert.equal(enHorarioLaboral(new Date("2026-11-02T12:29:00Z"), h), false);
+  // Lunes 08:59 en RD y 17:00 en RD
+  assert.equal(enHorarioLaboral(new Date("2026-11-02T12:59:00Z"), h), false);
+  assert.equal(enHorarioLaboral(new Date("2026-11-02T21:00:00Z"), h), false);
   // Domingo
   assert.equal(enHorarioLaboral(new Date("2026-11-01T14:00:00Z"), h), false);
-  assert.match(textoHorario(h), /lunes: 08:30 a 17:30; martes: cerrado/);
+  assert.match(textoHorario(h), /lunes: 09:00 a 17:00; martes: cerrado/);
 });
 
 test("motor: en horario laboral solo guarda el mensaje, sin llamar a la IA", async () => {

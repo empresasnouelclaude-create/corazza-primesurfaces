@@ -30,7 +30,7 @@ export type MotivoPase = "listo_para_cotizar" | "pide_persona" | "reclamo" | "pr
 export type Conversacion = {
   /** Telefono del cliente en formato internacional, sin "+". */
   id: string;
-  /** "asistente": responde la IA. "vendedor": la IA no responde. */
+  /** "asistente": la IA atiende el caso. "vendedor": el caso ya lo tiene ventas (fuera de horario la IA solo acompaña). */
   estado: "asistente" | "vendedor";
   datos: DatosCliente;
   /** Historial tal como lo devuelve la API (se reenvia sin modificar). */

@@ -3,18 +3,18 @@
 // WhatsApp Business (mismo numero, modo coexistencia) y el asistente solo
 // guarda los mensajes.
 //
-// TODO(dueño): confirmar el horario real. Para cambiarlo, editar HORARIO.
-// Hora de Republica Dominicana (UTC-4, sin horario de verano).
+// Horario confirmado por los dueños: 9:00 a 5:00 p. m. Para cambiarlo,
+// editar HORARIO. Hora de Republica Dominicana (UTC-4, sin horario de verano).
 
 /** Dia de la semana (0 = domingo … 6 = sábado) -> tramos [inicio, fin) en "HH:MM". */
 export const HORARIO: Record<number, [string, string][]> = {
-  1: [["08:30", "17:30"]], // lunes
-  2: [["08:30", "17:30"]],
-  3: [["08:30", "17:30"]],
-  4: [["08:30", "17:30"]],
-  5: [["08:30", "17:30"]], // viernes
-  6: [["09:00", "13:00"]], // sábado
-  // domingo: sin horario (atiende el asistente todo el día)
+  1: [["09:00", "17:00"]], // lunes
+  2: [["09:00", "17:00"]],
+  3: [["09:00", "17:00"]],
+  4: [["09:00", "17:00"]],
+  5: [["09:00", "17:00"]], // viernes
+  // sábado y domingo: sin horario (atiende el asistente todo el día).
+  // TODO(dueño): si el sábado también se trabaja, agregar 6: [["09:00", "17:00"]].
 };
 
 const ZONA = "America/Santo_Domingo";
