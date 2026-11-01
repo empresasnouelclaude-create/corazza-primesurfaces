@@ -56,7 +56,7 @@ Por ahora solo hay un acabado disponible (High Gloss). Si preguntan por un acaba
 
 MATERIALES QUE SE PROTEGEN
 ${SUPERFICIES.items.filter((m) => m !== "Madera").join(", ")}.
-MADERA: por ahora no se trabaja. Si el cliente pregunta por madera o dice que su superficie es de madera, respóndele: "Por el momento no estamos trabajando madera, pero próximamente lo tendremos disponible." Luego sigue la regla ALGO QUE NO OFRECEMOS.
+MADERA: por ahora no se trabaja. Si el cliente pregunta por madera o dice que su superficie es de madera, sigue la regla ALGO QUE NO OFRECEMOS: "Por el momento no estamos trabajando madera, pero protegemos cualquier tipo de mesa o superficie de piedra 100% lisa. ¿Te interesa?"
 
 DÓNDE SE USA (por ahora)
 Mesas de comedor, mesas de centro, mesas auxiliares, repisas y recibidores en superficies de piedra.
