@@ -20,7 +20,7 @@ export const HERRAMIENTAS: Anthropic.Beta.BetaTool[] = [
         nombre: { ...texto, description: "Nombre del cliente" },
         superficie: { ...texto, description: "Qué quiere proteger, por ejemplo 'mesa de comedor', 'mesa de centro', 'mesa auxiliar', 'repisa' o 'recibidor'" },
         material: { ...texto, description: "Material: mármol, cuarzo, granito, madera, porcelanato u otro" },
-        medidas: { ...texto, description: "Medidas tal como las dio, con unidad, por ejemplo '240 x 90 cm'" },
+        medidas: { ...texto, description: "Medidas tal como las dio, con unidad. Si son varias superficies, todas juntas, por ejemplo 'comedor 240 x 90 cm; centro 120 x 60 cm'" },
         sector: { ...texto, description: "Ciudad y sector, por ejemplo 'Santo Domingo, Piantini'" },
         fecha_deseada: { ...texto, description: "Para cuándo lo necesita, en sus palabras" },
         notas: { ...texto, description: "Otro detalle útil para el vendedor" },
@@ -31,7 +31,7 @@ export const HERRAMIENTAS: Anthropic.Beta.BetaTool[] = [
   },
   {
     name: "enviar_guia_medicion",
-    description: "Devuelve el enlace a la guía de la web para medir mesas y superficies. Úsala cada vez que pidas las medidas.",
+    description: "Devuelve el enlace a la guía de la web para medir mesas y superficies. Úsala solo si el enlace todavía no está en la conversación.",
     strict: true,
     input_schema: { type: "object", properties: {}, required: [], additionalProperties: false },
   },
