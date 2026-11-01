@@ -5,7 +5,7 @@
 // sirve igual para el webhook de WhatsApp y para el simulador.
 import type Anthropic from "@anthropic-ai/sdk";
 import { HERRAMIENTAS, ejecutarHerramienta } from "./herramientas.ts";
-import { instruccionesAsistente } from "./prompt.ts";
+import { MENSAJE_BIENVENIDA, instruccionesAsistente } from "./prompt.ts";
 import type { Accion, Conversacion, Entrada } from "./tipos.ts";
 
 export type ParametrosIA = Anthropic.Beta.Messages.MessageCreateParamsNonStreaming;
@@ -81,10 +81,13 @@ export async function responder({
   const respuestas: string[] = [];
   const acciones: Accion[] = [];
 
+  const esNueva = conversacion.mensajes.length === 0;
   // El historial se guarda siempre, aunque la conversacion la lleve un vendedor.
   conv.mensajes.push({ role: "user", content: contenidoCliente(entrada) });
   if (!conv.datos.nombre && entrada.nombrePerfil) conv.datos = { ...conv.datos, nombre: entrada.nombrePerfil };
   if (conv.estado === "vendedor") return { conversacion: conv, respuestas, acciones };
+  // Bienvenida fija al empezar una conversacion (la IA sigue con la primera pregunta).
+  if (esNueva) respuestas.push(MENSAJE_BIENVENIDA);
 
   for (let vuelta = 0; vuelta < MAX_VUELTAS; vuelta++) {
     const respuesta = await crear(parametrosIA(conv, modelo));

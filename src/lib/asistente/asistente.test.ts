@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import type Anthropic from "@anthropic-ai/sdk";
 import { HERRAMIENTAS, ejecutarHerramienta } from "./herramientas.ts";
+import { MENSAJE_BIENVENIDA } from "./prompt.ts";
 import { MENSAJE_PASE, parametrosIA, responder, type CrearMensaje, type ParametrosIA } from "./motor.ts";
 import { instruccionesAsistente } from "./prompt.ts";
 import { nuevaConversacion } from "./tipos.ts";
@@ -72,7 +73,7 @@ test("motor: ejecuta herramientas, devuelve el texto y conserva el historial", a
     crear,
     ahora: AHORA,
   });
-  assert.deepEqual(r.respuestas, ["¡Qué bien! ¿Me compartes las medidas aproximadas?"]);
+  assert.deepEqual(r.respuestas, [MENSAJE_BIENVENIDA, "¡Qué bien! ¿Me compartes las medidas aproximadas?"]);
   assert.equal(r.conversacion.datos.superficie, "mesa de comedor");
   assert.equal(r.conversacion.datos.nombre, "Patricia");
   // usuario, asistente (herramienta), resultado, asistente (texto)
@@ -101,7 +102,7 @@ test("motor: con la conversacion en manos del vendedor, guarda el mensaje pero n
 test("motor: si la IA declina, pasa al vendedor con un mensaje amable", async () => {
   const { crear } = iaFalsa([{ stop_reason: "refusal", content: [] }]);
   const r = await responder({ conversacion: nuevaConversacion("1"), entrada: { texto: "..." }, crear, ahora: AHORA });
-  assert.deepEqual(r.respuestas, [MENSAJE_PASE]);
+  assert.deepEqual(r.respuestas, [MENSAJE_BIENVENIDA, MENSAJE_PASE]);
   assert.equal(r.conversacion.estado, "vendedor");
 });
 
@@ -111,7 +112,7 @@ test("motor: las fotos pedidas salen como accion", async () => {
     { stop_reason: "end_turn", content: [texto("¿Qué te parece?")] },
   ]);
   const r = await responder({ conversacion: nuevaConversacion("1"), entrada: { texto: "¿Cómo se ve?" }, crear });
-  assert.deepEqual(r.respuestas, ["Te comparto cómo se ve:", "¿Qué te parece?"]);
+  assert.deepEqual(r.respuestas, [MENSAJE_BIENVENIDA, "Te comparto cómo se ve:", "¿Qué te parece?"]);
   const fotos = r.acciones.find((a) => a.tipo === "enviar_fotos");
   assert.ok(fotos && fotos.tipo === "enviar_fotos" && fotos.fotos[0].url.endsWith(".jpg"));
 });
@@ -163,4 +164,15 @@ test("almacen en memoria: no atiende dos veces el mismo mensaje", async () => {
   const a = new AlmacenMemoria();
   assert.equal(await a.marcarAtendido("wamid.1"), true);
   assert.equal(await a.marcarAtendido("wamid.1"), false);
+});
+
+test("motor: la bienvenida fija sale solo en el primer mensaje", async () => {
+  const { responder } = await import("./motor.ts");
+  const { nuevaConversacion } = await import("./tipos.ts");
+  const texto = (t: string) => ({ stop_reason: "end_turn" as const, content: [{ type: "text" as const, text: t, citations: null }] });
+  const { crear } = iaFalsa([texto("¿Qué te gustaría proteger?"), texto("¿Me envías una foto?")]);
+  const r1 = await responder({ conversacion: nuevaConversacion("1809"), entrada: { texto: "Hola" }, crear });
+  assert.deepEqual(r1.respuestas, [MENSAJE_BIENVENIDA, "¿Qué te gustaría proteger?"]);
+  const r2 = await responder({ conversacion: r1.conversacion, entrada: { texto: "Mi mesa de comedor" }, crear });
+  assert.deepEqual(r2.respuestas, ["¿Me envías una foto?"]);
 });
