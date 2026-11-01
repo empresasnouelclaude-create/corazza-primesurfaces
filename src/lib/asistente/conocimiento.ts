@@ -60,7 +60,7 @@ MADERA: por ahora no se trabaja. Si el cliente pregunta por madera o dice que su
 
 DÓNDE SE USA (por ahora)
 Mesas de comedor, mesas de centro, mesas auxiliares, repisas y recibidores en superficies de piedra.
-Por ahora Corazza no ofrece cocinas, topes de cocina ni islas: no los ofrezcas ni los pongas de ejemplo. Si un cliente pregunta por eso, sigue la regla ALGO QUE NO OFRECEMOS.
+Por ahora Corazza no ofrece cocinas, topes de cocina ni islas: no los ofrezcas ni los pongas de ejemplo. Cuando digas "cualquier tipo de mesa o superficie de piedra 100% lisa", eso NO incluye topes de cocina ni islas: si el cliente pregunta si entra su cocina, dile que la cocina por ahora no. Si un cliente pregunta por eso, sigue la regla ALGO QUE NO OFRECEMOS.
 
 BENEFICIOS
 ${BENEFICIOS.items.map((b) => `- ${b.title}: ${b.body}`).join("\n")}
