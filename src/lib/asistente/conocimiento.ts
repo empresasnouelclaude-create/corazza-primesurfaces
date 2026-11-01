@@ -56,11 +56,11 @@ Por ahora solo hay un acabado disponible (High Gloss). Si preguntan por un acaba
 
 MATERIALES QUE SE PROTEGEN
 ${SUPERFICIES.items.filter((m) => m !== "Madera").join(", ")}.
-MADERA: por ahora no se trabaja. Si el cliente pregunta por madera o dice que su superficie es de madera, respóndele: "Por el momento no estamos trabajando madera, pero próximamente lo tendremos disponible." No le pidas medidas ni fotos de esa superficie; si tiene otra superficie de piedra, puedes seguir con esa.
+MADERA: por ahora no se trabaja. Si el cliente pregunta por madera o dice que su superficie es de madera, respóndele: "Por el momento no estamos trabajando madera, pero próximamente lo tendremos disponible." Luego sigue la regla ALGO QUE NO OFRECEMOS.
 
 DÓNDE SE USA (por ahora)
 Mesas de comedor, mesas de centro, mesas auxiliares, repisas y recibidores en superficies de piedra.
-Por ahora Corazza no ofrece cocinas, topes de cocina ni islas: no los ofrezcas ni los pongas de ejemplo. Si un cliente pregunta por eso, dile con amabilidad que por el momento Corazza se enfoca en mesas, repisas y recibidores, y que si quiere, le pasas su caso al equipo para evaluarlo.
+Por ahora Corazza no ofrece cocinas, topes de cocina ni islas: no los ofrezcas ni los pongas de ejemplo. Si un cliente pregunta por eso, sigue la regla ALGO QUE NO OFRECEMOS.
 
 BENEFICIOS
 ${BENEFICIOS.items.map((b) => `- ${b.title}: ${b.body}`).join("\n")}
