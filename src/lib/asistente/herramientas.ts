@@ -31,7 +31,7 @@ export const HERRAMIENTAS: Anthropic.Beta.BetaTool[] = [
   },
   {
     name: "enviar_guia_medicion",
-    description: "Devuelve el enlace a la guía de la web para medir mesas y superficies. Úsala cada vez que pidas las medidas.",
+    description: "Devuelve el enlace a la guía de la web para medir mesas y superficies. Úsala solo si el enlace todavía no está en la conversación.",
     strict: true,
     input_schema: { type: "object", properties: {}, required: [], additionalProperties: false },
   },
