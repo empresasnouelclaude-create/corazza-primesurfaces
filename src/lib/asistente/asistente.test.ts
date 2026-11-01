@@ -90,10 +90,19 @@ test("parametros: con Sonnet u Opus se pide el modelo de respaldo", () => {
   assert.deepEqual(p.betas, ["server-side-fallback-2026-07-01"]);
 });
 
-test("motor: con la conversacion en manos del vendedor, guarda el mensaje pero no llama a la IA", async () => {
+test("motor: caso ya en ventas, fuera de horario responde la IA con la nota del caso", async () => {
+  const conv = { ...nuevaConversacion("1"), estado: "vendedor" as const, mensajes: [{ role: "user" as const, content: "hola" }] };
+  const { crear, llamadas } = iaFalsa([{ stop_reason: "end_turn", content: [{ type: "text", text: "El equipo te escribe a primera hora.", citations: null }] }]);
+  const r = await responder({ conversacion: conv, entrada: { texto: "¿Ya me cotizaron?" }, crear });
+  assert.deepEqual(r.respuestas, ["El equipo te escribe a primera hora."]);
+  assert.match(JSON.stringify(llamadas[0].messages.at(-1)), /ya se pasó al equipo de ventas/);
+  assert.equal(r.conversacion.estado, "vendedor");
+});
+
+test("motor: caso ya en ventas, en horario laboral no responde", async () => {
   const conv = { ...nuevaConversacion("1"), estado: "vendedor" as const };
   const { crear, llamadas } = iaFalsa([]);
-  const r = await responder({ conversacion: conv, entrada: { texto: "¿Ya me cotizaron?" }, crear });
+  const r = await responder({ conversacion: conv, entrada: { texto: "¿Ya me cotizaron?" }, crear, soloGuardar: true });
   assert.equal(llamadas.length, 0);
   assert.equal(r.respuestas.length, 0);
   assert.equal(r.conversacion.mensajes.length, 1);
@@ -197,4 +206,42 @@ test("motor: si el primer mensaje trae una pregunta, no va la bienvenida fija y 
   assert.deepEqual(r.respuestas, ["Hola, soy el asistente…"]);
   assert.match(JSON.stringify(llamadas[0].messages[0].content), /Nota del sistema/);
   assert.ok(JSON.stringify(llamadas[0].messages).includes(NOTA_PRIMER_MENSAJE.slice(0, 20)));
+});
+
+test("horario: el asistente solo atiende fuera del horario laboral (hora de RD)", async () => {
+  const { enHorarioLaboral, textoHorario } = await import("./horario.ts");
+  const h = { 1: [["09:00", "17:00"]] as [string, string][] };
+  // Lunes 3 nov 2026: 10:00 en RD = 14:00 UTC
+  assert.equal(enHorarioLaboral(new Date("2026-11-02T14:00:00Z"), h), true);
+  // Lunes 20:00 en RD = martes 00:00 UTC
+  assert.equal(enHorarioLaboral(new Date("2026-11-03T00:00:00Z"), h), false);
+  // Lunes 08:59 en RD y 17:00 en RD
+  assert.equal(enHorarioLaboral(new Date("2026-11-02T12:59:00Z"), h), false);
+  assert.equal(enHorarioLaboral(new Date("2026-11-02T21:00:00Z"), h), false);
+  // Domingo
+  assert.equal(enHorarioLaboral(new Date("2026-11-01T14:00:00Z"), h), false);
+  assert.match(textoHorario(h), /lunes: 09:00 a 17:00; martes: cerrado/);
+});
+
+test("motor: en horario laboral solo guarda el mensaje, sin llamar a la IA", async () => {
+  const { responder } = await import("./motor.ts");
+  const { nuevaConversacion } = await import("./tipos.ts");
+  const { crear, llamadas } = iaFalsa([]);
+  const r = await responder({ conversacion: nuevaConversacion("1"), entrada: { texto: "Hola, tengo una mesa" }, crear, soloGuardar: true });
+  assert.deepEqual(r.respuestas, []);
+  assert.equal(llamadas.length, 0);
+  assert.equal(r.conversacion.mensajes.length, 1);
+});
+
+test("whatsapp: detecta las llamadas que inicia el cliente (solo el inicio)", async () => {
+  const { leerLlamadas } = await import("./whatsapp.ts");
+  const aviso = {
+    entry: [{ changes: [{ field: "calls", value: { calls: [
+      { id: "c1", from: "18095550142", event: "connect", direction: "USER_INITIATED" },
+      { id: "c1", from: "18095550142", event: "terminate", direction: "USER_INITIATED" },
+      { id: "c2", from: "18095550143", event: "connect", direction: "BUSINESS_INITIATED" },
+    ] } }] }],
+  };
+  assert.deepEqual(leerLlamadas(aviso), [{ id: "c1", de: "18095550142" }]);
+  assert.deepEqual(leerLlamadas({}), []);
 });

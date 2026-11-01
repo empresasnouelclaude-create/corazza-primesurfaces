@@ -8,12 +8,15 @@
 import { after } from "next/server";
 import { AlmacenMemoria, AlmacenSupabase, type Almacen } from "@/lib/asistente/almacen.ts";
 import { configuracionIA } from "@/lib/asistente/ia.ts";
+import { enHorarioLaboral } from "@/lib/asistente/horario.ts";
 import { responder } from "@/lib/asistente/motor.ts";
+import { MENSAJE_LLAMADA } from "@/lib/asistente/prompt.ts";
 import {
   descargarImagen,
   enviarImagen,
   enviarTexto,
   firmaValida,
+  leerLlamadas,
   leerMensajes,
   marcarLeido,
   verificarSuscripcion,
@@ -49,7 +52,9 @@ export async function POST(request: Request) {
   const ia = configuracionIA();
   if (!cred || !ia) return new Response("Asistente sin configurar", { status: 503 });
 
-  const mensajes = leerMensajes(JSON.parse(cuerpo));
+  const aviso = JSON.parse(cuerpo);
+  const mensajes = leerMensajes(aviso);
+  const llamadas = leerLlamadas(aviso);
   const guardado = elegirAlmacen();
 
   // Se responde 200 enseguida (Meta lo exige) y se atiende despues.
@@ -63,6 +68,20 @@ export async function POST(request: Request) {
         console.error("Asistente WhatsApp:", error);
       }
     }
+    // Llamadas por WhatsApp: no se atienden; se envia un mensaje.
+    for (const llamada of llamadas) {
+      try {
+        if (!(await guardado.marcarAtendido(`llamada:${llamada.id}`))) continue;
+        await enviarTexto(cred, llamada.de, MENSAJE_LLAMADA);
+        // Queda en el historial para que el asistente sepa que intento llamar.
+        const conv = await guardado.obtener(llamada.de);
+        conv.mensajes.push({ role: "user", content: `(Nota del sistema: el cliente intentó llamar por WhatsApp y se le envió: "${MENSAJE_LLAMADA}")` });
+        conv.actualizado = new Date().toISOString();
+        await guardado.guardar(conv);
+      } catch (error) {
+        console.error("Asistente WhatsApp (llamada):", error);
+      }
+    }
   });
   return new Response("OK", { status: 200 });
 }
@@ -73,11 +92,14 @@ async function atender(
   ia: NonNullable<ReturnType<typeof configuracionIA>>,
   almacen: Almacen,
 ) {
-  await marcarLeido(cred, mensaje.id).catch(() => {});
+  // En horario laboral responde la persona de ventas desde la app (mismo
+  // numero): el asistente solo guarda el mensaje y no lo marca como leido.
+  const soloGuardar = enHorarioLaboral();
+  if (!soloGuardar) await marcarLeido(cred, mensaje.id).catch(() => {});
   const conversacion = await almacen.obtener(mensaje.de);
 
   if (mensaje.tipo === "otro") {
-    if (conversacion.estado === "asistente") {
+    if (conversacion.estado === "asistente" && !soloGuardar) {
       await enviarTexto(cred, mensaje.de, "Por ahora puedo leer mensajes de texto y fotos. ¿Me lo escribes, por favor?");
     }
     return;
@@ -89,6 +111,7 @@ async function atender(
     entrada: { texto: mensaje.texto, imagen, nombrePerfil: mensaje.nombrePerfil },
     crear: ia.crear,
     modelo: ia.modelo,
+    soloGuardar,
   });
   await almacen.guardar(actualizada);
 

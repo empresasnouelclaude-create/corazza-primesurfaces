@@ -5,7 +5,7 @@
 // sirve igual para el webhook de WhatsApp y para el simulador.
 import type Anthropic from "@anthropic-ai/sdk";
 import { HERRAMIENTAS, ejecutarHerramienta } from "./herramientas.ts";
-import { MENSAJE_BIENVENIDA, NOTA_PRIMER_MENSAJE, instruccionesAsistente } from "./prompt.ts";
+import { MENSAJE_BIENVENIDA, NOTA_CASO_EN_VENTAS, NOTA_PRIMER_MENSAJE, instruccionesAsistente } from "./prompt.ts";
 import type { Accion, Conversacion, Entrada } from "./tipos.ts";
 
 export type ParametrosIA = Anthropic.Beta.Messages.MessageCreateParamsNonStreaming;
@@ -87,12 +87,15 @@ export async function responder({
   crear,
   modelo = MODELO_POR_DEFECTO,
   ahora = new Date(),
+  soloGuardar = false,
 }: {
   conversacion: Conversacion;
   entrada: Entrada;
   crear: CrearMensaje;
   modelo?: string;
   ahora?: Date;
+  /** true en horario laboral: se guarda el mensaje y responde la persona de ventas. */
+  soloGuardar?: boolean;
 }): Promise<Respuesta> {
   let conv: Conversacion = { ...conversacion, mensajes: [...conversacion.mensajes], actualizado: ahora.toISOString() };
   const respuestas: string[] = [];
@@ -103,9 +106,12 @@ export async function responder({
   // El historial se guarda siempre, aunque la conversacion la lleve un vendedor.
   const contenido = contenidoCliente(entrada);
   if (esNueva && !soloSaludo) contenido.push({ type: "text", text: NOTA_PRIMER_MENSAJE });
+  if (conv.estado === "vendedor" && !soloGuardar) contenido.push({ type: "text", text: NOTA_CASO_EN_VENTAS });
   conv.mensajes.push({ role: "user", content: contenido });
   if (!conv.datos.nombre && entrada.nombrePerfil) conv.datos = { ...conv.datos, nombre: entrada.nombrePerfil };
-  if (conv.estado === "vendedor") return { conversacion: conv, respuestas, acciones };
+  // En horario laboral responde ventas: solo se guarda. Fuera de horario el
+  // asistente responde siempre, aunque el caso ya este con ventas.
+  if (soloGuardar) return { conversacion: conv, respuestas, acciones };
   // Si el primer mensaje es solo un saludo, va la bienvenida fija y nada mas.
   // Si trae una pregunta, la IA saluda, responde y hace las preguntas (ver
   // PRIMER MENSAJE CON PREGUNTA en prompt.ts).

@@ -43,6 +43,7 @@ type CuerpoWebhook = {
           text?: { body?: string };
           image?: { id?: string; caption?: string };
         }[];
+        calls?: { id?: string; from?: string; event?: string; direction?: string }[];
       };
     }[];
   }[];
@@ -62,6 +63,27 @@ export function leerMensajes(cuerpo: unknown): MensajeEntrante[] {
         else if (m.type === "image")
           salida.push({ ...base, tipo: "imagen", texto: m.image?.caption ?? null, mediaId: m.image?.id ?? null });
         else salida.push({ ...base, tipo: "otro", texto: null, mediaId: null });
+      }
+    }
+  }
+  return salida;
+}
+
+/** Llamada de WhatsApp entrante (aviso "calls" de Meta). */
+export type LlamadaEntrante = { id: string; de: string };
+
+/**
+ * Extrae las llamadas que inicia un cliente. Meta avisa al empezar la llamada
+ * (event "connect") y al terminar ("terminate"); se toma solo el inicio.
+ */
+export function leerLlamadas(cuerpo: unknown): LlamadaEntrante[] {
+  const salida: LlamadaEntrante[] = [];
+  for (const entrada of (cuerpo as CuerpoWebhook)?.entry ?? []) {
+    for (const cambio of entrada.changes ?? []) {
+      for (const c of cambio.value?.calls ?? []) {
+        if (!c.id || !c.from || c.event !== "connect") continue;
+        if (c.direction && c.direction !== "USER_INITIATED") continue;
+        salida.push({ id: c.id, de: c.from });
       }
     }
   }
