@@ -232,3 +232,16 @@ test("motor: en horario laboral solo guarda el mensaje, sin llamar a la IA", asy
   assert.equal(llamadas.length, 0);
   assert.equal(r.conversacion.mensajes.length, 1);
 });
+
+test("whatsapp: detecta las llamadas que inicia el cliente (solo el inicio)", async () => {
+  const { leerLlamadas } = await import("./whatsapp.ts");
+  const aviso = {
+    entry: [{ changes: [{ field: "calls", value: { calls: [
+      { id: "c1", from: "18095550142", event: "connect", direction: "USER_INITIATED" },
+      { id: "c1", from: "18095550142", event: "terminate", direction: "USER_INITIATED" },
+      { id: "c2", from: "18095550143", event: "connect", direction: "BUSINESS_INITIATED" },
+    ] } }] }],
+  };
+  assert.deepEqual(leerLlamadas(aviso), [{ id: "c1", de: "18095550142" }]);
+  assert.deepEqual(leerLlamadas({}), []);
+});

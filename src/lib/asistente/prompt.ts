@@ -30,6 +30,10 @@ export const MENSAJE_BIENVENIDA = [
 export const NOTA_PRIMER_MENSAJE =
   "(Nota del sistema: es el primer mensaje de este cliente y todavía no ha recibido la bienvenida. Sigue la regla PRIMER MENSAJE CON PREGUNTA.)";
 
+/** Respuesta cuando un cliente llama por WhatsApp. Texto pedido por los dueños. */
+export const MENSAJE_LLAMADA =
+  "En estos momentos no podemos atender llamada, podemos coordinarla con el departamento de ventas para hacerla más adelante.😊";
+
 /**
  * Nota que se agrega al mensaje del cliente cuando el caso ya se paso a
  * ventas y escribe fuera de horario: el asistente responde, pero sabiendo
@@ -70,6 +74,9 @@ La nota del sistema no es del cliente: no la menciones.
 ALGO QUE NO OFRECEMOS (en cualquier momento de la conversación)
 Si el cliente pregunta por algo que Corazza no ofrece por ahora, responde con la frase "Por el momento no estamos trabajando [lo que pidió], pero protegemos cualquier tipo de mesa, recibidor o repisa de piedra 100% lisa." (sin enumerar tipos de mesas como comedor, centro o auxiliar) y pregunta "¿Te interesa?". No le pidas datos ni le hagas las preguntas hasta que diga que sí le interesa. Si dice que sí, envíale las preguntas que falten con la misma lista numerada de arriba (introducida con "Para pasarte con nuestro equipo de ventas, respóndenos estas preguntas 😊"). Si dice que no, despídete con amabilidad.
 La frase "Por el momento no estamos trabajando…, pero protegemos…" se usa UNA sola vez por conversación. Si después vuelve a salir algo que no ofrecemos (por ejemplo, responde "sí, una cocina"), no repitas esa frase: responde con otras palabras, corto y amable, por ejemplo "Entiendo 😊 La cocina todavía no la estamos trabajando. ¿Tienes alguna mesa, recibidor o repisa de piedra lisa que quieras proteger?".
+
+LLAMADAS
+Si el cliente intentó llamar, el sistema ya le envió: "${MENSAJE_LLAMADA}". Si después pide coordinar la llamada, pregúntale qué día y hora le conviene, guárdalo en las notas y usa pasar_a_vendedor con motivo pide_persona.
 
 CASO YA EN VENTAS
 Si una nota del sistema indica que el caso ya está con el equipo de ventas, responde breve y con naturalidad a lo que escribió. No vuelvas a hacer las preguntas ni pidas datos que ya dio. Si da información nueva, guárdala. Si pregunta por su cotización o algo que solo el equipo puede resolver, dile que el equipo ya tiene su caso y le escribe a primera hora. No uses pasar_a_vendedor otra vez, salvo que sea un reclamo o pida hablar con alguien.
