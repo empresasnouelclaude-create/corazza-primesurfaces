@@ -33,7 +33,10 @@ export default function Reporte({ report }: { report: Report }) {
         <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <dt className="font-corazza-sans text-xs font-semibold tracking-[0.12em] text-corazza-taupe">{TEXT.reportClient}</dt>
-            <dd className="mt-1 font-corazza-sans text-lg font-semibold text-corazza-charcoal">{report.client || TEXT.reportNoClient}</dd>
+            <dd className="mt-1 font-corazza-sans text-lg font-semibold text-corazza-charcoal">
+              {report.client || TEXT.reportNoClient}
+              {report.code && <span className="ml-2 font-normal text-corazza-taupe">· Caso #{report.code}</span>}
+            </dd>
           </div>
           <div className="sm:text-right">
             <dt className="font-corazza-sans text-xs font-semibold tracking-[0.12em] text-corazza-taupe">{TEXT.reportDate}</dt>

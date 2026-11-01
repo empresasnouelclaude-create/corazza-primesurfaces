@@ -2,12 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { coincide, formatoCodigo } from "@/lib/panel/codigo.ts";
 
 type Remitente = { id: string; nombre: string; descripcion: string; variable: string; conectado: boolean };
 type Estado = { token: boolean; plantillas: boolean; historial: boolean; remitentes: Remitente[] };
 type Plantilla = { nombre: string; idioma: string; categoria: string; texto: string; variables: number; compatible: boolean };
+type Cliente = { telefono: string; codigo: number | null; nombre: string | null; superficie: string | null; sector: string | null };
 type Envio = {
   id: string;
+  codigo: number | null;
   remitente: string;
   para: string;
   nombre: string | null;
@@ -46,6 +49,10 @@ export default function WhatsAppPanel() {
   const [plantillaId, setPlantillaId] = useState("");
   const [variables, setVariables] = useState<string[]>([]);
   const [enviando, setEnviando] = useState(false);
+  const [codigo, setCodigo] = useState<number | null>(null);
+  const [buscarCliente, setBuscarCliente] = useState("");
+  const [resultados, setResultados] = useState<Cliente[]>([]);
+  const [filtro, setFiltro] = useState("");
 
   const plantilla = useMemo(() => plantillas.find((p) => `${p.nombre}|${p.idioma}` === plantillaId) ?? null, [plantillas, plantillaId]);
 
@@ -106,11 +113,42 @@ export default function WhatsAppPanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Buscar un cliente del asistente por codigo, nombre o telefono.
+  useEffect(() => {
+    const q = buscarCliente.trim();
+    if (!estado || !q) {
+      queueMicrotask(() => setResultados([]));
+      return;
+    }
+    const id = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/panel/clientes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ clave: clave(), buscar: q }),
+        });
+        const r = await res.json();
+        setResultados(res.ok ? (r.clientes as Cliente[]).slice(0, 6) : []);
+      } catch {
+        setResultados([]);
+      }
+    }, 300);
+    return () => clearTimeout(id);
+  }, [buscarCliente, estado]);
+
+  function elegirCliente(c: Cliente) {
+    setTelefono(c.telefono);
+    setNombre(c.nombre ?? "");
+    setCodigo(c.codigo);
+    setBuscarCliente("");
+    setResultados([]);
+  }
+
   async function enviar() {
     setEnviando(true);
     setAviso(null);
     try {
-      const base = { accion: "enviar", remitente, para: telefono, nombre };
+      const base = { accion: "enviar", remitente, para: telefono, nombre, codigo };
       const r =
         modo === "texto"
           ? await api({ ...base, tipo: "texto", texto })
@@ -245,10 +283,42 @@ export default function WhatsAppPanel() {
                   </div>
                 </fieldset>
 
+                <div className="relative">
+                  <label className="block text-sm">
+                    <span className="mb-1 block font-semibold">Buscar cliente</span>
+                    <input
+                      type="search"
+                      value={buscarCliente}
+                      onChange={(e) => setBuscarCliente(e.target.value)}
+                      placeholder="Código, nombre o teléfono"
+                      className={campo}
+                    />
+                  </label>
+                  {resultados.length > 0 && (
+                    <ul className="absolute inset-x-0 top-full z-10 mt-1 overflow-hidden rounded-lg border border-corazza-charcoal/15 bg-white shadow-lg">
+                      {resultados.map((r) => (
+                        <li key={r.telefono}>
+                          <button type="button" onClick={() => elegirCliente(r)} className="flex w-full items-baseline gap-2 px-3 py-2.5 text-left text-sm hover:bg-corazza-cream/40">
+                            {formatoCodigo(r.codigo) && <span className="text-xs font-semibold text-corazza-taupe">#{formatoCodigo(r.codigo)}</span>}
+                            <span className="font-semibold">{r.nombre ?? `+${r.telefono}`}</span>
+                            <span className="min-w-0 truncate text-xs text-corazza-taupe">{[r.superficie, r.sector].filter(Boolean).join(" · ")}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {codigo !== null && <p className="mt-1 text-xs text-corazza-taupe">Cliente #{formatoCodigo(codigo)}</p>}
+                </div>
+
                 <div className="grid gap-3 sm:grid-cols-2">
                   <label className="block text-sm">
                     <span className="mb-1 block font-semibold">Teléfono del cliente</span>
-                    <input value={telefono} onChange={(e) => setTelefono(e.target.value)} inputMode="tel" placeholder="809 555 0142" className={campo} />
+                    <input
+                      value={telefono}
+                      onChange={(e) => {
+                        setTelefono(e.target.value);
+                        setCodigo(null);
+                      }} inputMode="tel" placeholder="809 555 0142" className={campo} />
                   </label>
                   <label className="block text-sm">
                     <span className="mb-1 block font-semibold">
@@ -351,19 +421,32 @@ export default function WhatsAppPanel() {
 
               {/* Historial */}
               <section aria-labelledby="historial" className="min-w-0 rounded-2xl border border-corazza-charcoal/10 bg-white">
-                <h2 id="historial" className="border-b border-corazza-charcoal/10 px-5 py-4 font-corazza-serif text-2xl font-semibold">
-                  Enviados
-                </h2>
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-corazza-charcoal/10 px-5 py-4">
+                  <h2 id="historial" className="font-corazza-serif text-2xl font-semibold">
+                    Enviados
+                  </h2>
+                  {envios.length > 0 && (
+                    <input
+                      type="search"
+                      value={filtro}
+                      onChange={(e) => setFiltro(e.target.value)}
+                      placeholder="Buscar por código o nombre"
+                      aria-label="Buscar en enviados"
+                      className="min-h-[40px] w-full rounded-lg border border-corazza-charcoal/15 px-3 text-base sm:w-56"
+                    />
+                  )}
+                </div>
                 {!estado.historial ? (
                   <p className="px-5 py-8 text-center text-sm text-corazza-taupe">El historial se guarda cuando la base de datos esté conectada.</p>
                 ) : envios.length === 0 ? (
                   <p className="px-5 py-8 text-center text-sm text-corazza-taupe">Todavía no se ha enviado nada desde el panel.</p>
                 ) : (
                   <ul className="divide-y divide-corazza-charcoal/5">
-                    {envios.map((e) => (
+                    {envios.filter((e) => coincide(filtro, { codigo: e.codigo, nombre: e.nombre, telefono: e.para })).map((e) => (
                       <li key={e.id} className="space-y-1 px-5 py-3 text-sm">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <p className="font-semibold">
+                            {formatoCodigo(e.codigo) && <span className="mr-1.5 text-xs text-corazza-taupe">#{formatoCodigo(e.codigo)}</span>}
                             {e.nombre ?? `+${e.para}`}
                             <span className="font-normal text-corazza-taupe">
                               {" "}

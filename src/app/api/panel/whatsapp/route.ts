@@ -29,6 +29,7 @@ type Cuerpo = {
   texto?: unknown;
   plantilla?: { nombre?: unknown; idioma?: unknown };
   variables?: unknown;
+  codigo?: unknown;
 };
 
 const error = (mensaje: string, status: number) => Response.json({ error: mensaje }, { status });
@@ -89,6 +90,7 @@ export async function POST(request: Request) {
   const para = normalizarTelefono(texto(c.para, 30));
   if (!para) return error("El teléfono del cliente no es válido.", 400);
   const nombre = texto(c.nombre, 80) || null;
+  const codigo = typeof c.codigo === "number" && Number.isInteger(c.codigo) && c.codigo > 0 ? c.codigo : null;
   const cred = { token, phoneNumberId };
 
   let contenido: string;
@@ -123,7 +125,7 @@ export async function POST(request: Request) {
   if (db) {
     const { error: e } = await db
       .from("envios_whatsapp")
-      .insert({ remitente: remitente.id, para, nombre, tipo: c.tipo, contenido, wamid });
+      .insert({ remitente: remitente.id, para, nombre, codigo, tipo: c.tipo, contenido, wamid });
     if (e) console.error("Historial de WhatsApp:", e);
   }
   return Response.json({ ok: true, para });

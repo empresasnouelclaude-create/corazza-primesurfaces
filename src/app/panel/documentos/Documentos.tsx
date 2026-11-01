@@ -31,6 +31,18 @@ const ESTADOS: Record<EstadoPago, { texto: string; clase: string }> = {
 
 const plural = (n: number, uno: string, varios: string) => `${n} ${n === 1 ? uno : varios}`;
 
+const sinAcentos = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+/**
+ * Busca por cliente, numero, NCF o notas. El codigo de cliente (0007) se
+ * encuentra si se escribio en la cotizacion o factura de Citrus.
+ */
+function coincideDocumento(q: string, d: DocumentoGuardado): boolean {
+  const t = sinAcentos(q.trim().replace(/^#/, ""));
+  if (!t) return true;
+  return [d.cliente.nombre, d.numero, d.ncf, d.notas, d.cliente.telefono].some((v) => v && sinAcentos(v).includes(t));
+}
+
 function mesActual() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -54,6 +66,7 @@ export default function Documentos() {
   const [abierto, setAbierto] = useState<string | null>(null);
   const [confirmarBorrado, setConfirmarBorrado] = useState(false);
   const [arrastrando, setArrastrando] = useState(false);
+  const [buscar, setBuscar] = useState("");
   const claveRef = useRef<HTMLInputElement>(null);
   const [pdfs, setPdfs] = useState<Record<string, string>>({}); // archivo -> URL temporal del PDF
   // null: aun no se sabe; true: base de datos; false: modo de prueba (navegador).
@@ -143,8 +156,9 @@ export default function Documentos() {
   const totales = useMemo(() => resumen(datos.documentos, desde, hasta), [datos.documentos, desde, hasta]);
   const enRango = (f: string | null) => !desde || ((f ?? "") >= desde && (f ?? "9999") <= hasta!);
   const ordenar = (a: DocumentoGuardado, b: DocumentoGuardado) => (b.fecha ?? "").localeCompare(a.fecha ?? "");
-  const facturas = datos.documentos.filter((d) => d.tipo === "factura" && enRango(d.fecha)).sort(ordenar);
-  const cotizaciones = datos.documentos.filter((d) => d.tipo === "cotizacion" && enRango(d.fecha)).sort(ordenar);
+  const facturas = datos.documentos.filter((d) => d.tipo === "factura" && enRango(d.fecha) && coincideDocumento(buscar, d)).sort(ordenar);
+  const cotizaciones = datos.documentos.filter((d) => d.tipo === "cotizacion" && enRango(d.fecha) && coincideDocumento(buscar, d)).sort(ordenar);
+  const deudores = totales.deudores.filter((d) => !buscar.trim() || sinAcentos(d.cliente).includes(sinAcentos(buscar.trim())));
   const meses = [...new Set(datos.documentos.map((d) => d.fecha?.slice(0, 7)).filter(Boolean) as string[])].sort().reverse();
   if (!meses.includes(mesActual())) meses.unshift(mesActual());
 
@@ -264,7 +278,7 @@ export default function Documentos() {
   const pestanas: { id: Pestana; texto: string; n: number }[] = [
     { id: "facturas", texto: "Facturas", n: facturas.length },
     { id: "cotizaciones", texto: "Cotizaciones", n: cotizaciones.length },
-    { id: "cobrar", texto: "Por cobrar", n: totales.deudores.length },
+    { id: "cobrar", texto: "Por cobrar", n: deudores.length },
     { id: "inventario", texto: "Inventario", n: datos.inventario.length },
   ];
 
@@ -392,6 +406,16 @@ export default function Documentos() {
         {/* Listas */}
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
           <div className="min-w-0 rounded-2xl border border-corazza-charcoal/10 bg-white">
+            <div className="border-b border-corazza-charcoal/10 p-2">
+              <input
+                type="search"
+                value={buscar}
+                onChange={(e) => setBuscar(e.target.value)}
+                placeholder="Buscar por cliente, número o código"
+                aria-label="Buscar documentos"
+                className="min-h-[40px] w-full rounded-lg border border-corazza-charcoal/15 px-3 text-base sm:max-w-xs"
+              />
+            </div>
             <div role="tablist" aria-label="Documentos" className="flex gap-1 overflow-x-auto border-b border-corazza-charcoal/10 p-2">
               {pestanas.map((p) => (
                 <button
@@ -409,11 +433,11 @@ export default function Documentos() {
             {pestana === "facturas" && tabla(facturas, "No hay facturas en este periodo. Sube un PDF de Citrus.", true)}
             {pestana === "cotizaciones" && tabla(cotizaciones, "No hay cotizaciones en este periodo.", false)}
             {pestana === "cobrar" &&
-              (totales.deudores.length === 0 ? (
+              (deudores.length === 0 ? (
                 <p className="px-4 py-10 text-center text-sm text-corazza-taupe">No hay saldos pendientes.</p>
               ) : (
                 <ul className="divide-y divide-corazza-charcoal/5">
-                  {totales.deudores.map((d) => (
+                  {deudores.map((d) => (
                     <li key={d.cliente} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
                       <div>
                         <p className="font-semibold">{d.cliente}</p>

@@ -61,3 +61,10 @@ create table if not exists envios_whatsapp (
 );
 create index if not exists envios_whatsapp_wamid on envios_whatsapp (wamid);
 alter table envios_whatsapp enable row level security;
+
+-- Codigo de cliente: numero secuencial de 4 digitos (0001, 0002…) que
+-- identifica cada caso en todo el panel. Se asigna solo al crear la
+-- conversacion; las que ya existian reciben el suyo al correr esto.
+create sequence if not exists codigo_cliente_seq start 1;
+alter table conversaciones add column if not exists codigo int unique default nextval('codigo_cliente_seq');
+alter table envios_whatsapp add column if not exists codigo int;
