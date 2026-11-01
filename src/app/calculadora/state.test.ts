@@ -127,3 +127,49 @@ test("reset: cero superficies, cliente vacio, centimetros y 10%", () => {
   assert.equal(s.priceInput, "");
   assert.equal(s.report, null);
 });
+
+test("transporte opcional: se suma a la cotizacion y queda en el reporte", () => {
+  let s = run([
+    { type: "dim", dim: "largo", value: "183" },
+    { type: "dim", dim: "ancho", value: "100" },
+    { type: "add" },
+    { type: "price", value: "800" },
+    { type: "generate", date: DATE },
+  ]);
+  const sinTransporte = s.report?.total ?? 0;
+  assert.equal(s.report?.transport, null);
+  assert.equal(sinTransporte, s.report?.quote);
+  s = reducer(s, { type: "transportOn", value: true });
+  s = reducer(s, { type: "province", value: "Santiago" });
+  s = reducer(s, { type: "transport", value: "1500" });
+  assert.deepEqual(s.report?.transport, { province: "Santiago", amount: 1500 });
+  assert.equal(s.report?.total?.toFixed(2), (sinTransporte + 1500).toFixed(2));
+  // Quitar el transporte lo saca del total.
+  s = reducer(s, { type: "transportOn", value: false });
+  assert.equal(s.report?.transport, null);
+  assert.equal(s.report?.total, sinTransporte);
+});
+
+test("ficha de WhatsApp: llena cliente y superficies; precio y transporte quedan manuales", async () => {
+  const { leerSuperficies } = await import("./medidas.ts");
+  let s = run([{ type: "price", value: "" }]);
+  s = reducer(s, {
+    type: "prefill",
+    client: "Laura",
+    surfaces: leerSuperficies("comedor 72 x 40 in; centro 48 x 24 in", "mesas"),
+    province: "Santiago",
+  });
+  assert.equal(s.client, "Laura");
+  assert.deepEqual(s.items.map((i) => [i.description, i.unit, i.shape]), [
+    ["comedor", "in", "rectangular"],
+    ["centro", "in", "rectangular"],
+  ]);
+  assert.equal(s.priceInput, "");
+  assert.equal(s.transportOn, false);
+  assert.equal(s.province, "Santiago");
+  // Sin unidad: queda en el formulario para completarla.
+  s = reducer(initialState(), { type: "prefill", client: "Ana", surfaces: leerSuperficies("60 x 30", "mesa de centro"), province: null });
+  assert.equal(s.items.length, 0);
+  assert.deepEqual(s.dimInputs, { largo: "60", ancho: "30" });
+  assert.equal(s.description, "mesa de centro");
+});

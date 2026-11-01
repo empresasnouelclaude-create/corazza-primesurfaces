@@ -1,6 +1,7 @@
 // Estado de la Calculadora Corazza como reducer puro (sin React), para
 // poder probarlo con `npm test` igual que las formulas.
 import { DEFAULT_SHAPE, DEFAULT_UNIT, TEXT } from "./config.ts";
+import type { SuperficieLeida } from "./medidas.ts";
 import {
   MARGIN_DEFAULT,
   SHAPE_DIMENSIONS,
@@ -34,6 +35,10 @@ export type Report = {
   filmFt2: number;
   pricePerFt2: number | null;
   quote: number | null;
+  /** Transporte (opcional): provincia y monto. */
+  transport: { province: string; amount: number } | null;
+  /** Cotizacion + transporte (null si no hay precio). */
+  total: number | null;
 };
 
 export type State = {
@@ -47,6 +52,9 @@ export type State = {
   nextId: number;
   margin: number;
   priceInput: string;
+  transportOn: boolean;
+  province: string;
+  transportInput: string;
   report: Report | null;
   /** true si habia un reporte y luego cambiaron los datos (para avisar). */
   reportStale: boolean;
@@ -64,7 +72,11 @@ export type Action =
   | { type: "reset" }
   | { type: "margin"; value: number }
   | { type: "price"; value: string }
-  | { type: "generate"; date: Date };
+  | { type: "transportOn"; value: boolean }
+  | { type: "province"; value: string }
+  | { type: "transport"; value: string }
+  | { type: "generate"; date: Date }
+  | { type: "prefill"; client: string; surfaces: SuperficieLeida[]; province: string | null };
 
 export function initialState(): State {
   return {
@@ -78,6 +90,9 @@ export function initialState(): State {
     nextId: 1,
     margin: MARGIN_DEFAULT,
     priceInput: "",
+    transportOn: false,
+    province: "",
+    transportInput: "",
     report: null,
     reportStale: false,
   };
@@ -89,14 +104,25 @@ export function priceValue(state: State): number | null {
   return parsed.ok ? parsed.value : null;
 }
 
+/** Transporte valido (agregado, con monto mayor que 0) o null. */
+export function transportValue(state: State): { province: string; amount: number } | null {
+  if (!state.transportOn) return null;
+  const parsed = parsePositive(state.transportInput);
+  return parsed.ok ? { province: state.province, amount: parsed.value } : null;
+}
+
 export function totals(state: State) {
   const total = totalFt2(state.items.map((i) => i.areaFt2));
   const price = priceValue(state);
+  const q = price === null ? null : quote(total, price, state.margin);
+  const transport = transportValue(state);
   return {
     totalFt2: total,
     filmFt2: filmFt2(total, state.margin),
     pricePerFt2: price,
-    quote: price === null ? null : quote(total, price, state.margin),
+    quote: q,
+    transport,
+    total: q === null ? null : q + (transport?.amount ?? 0),
   };
 }
 
@@ -111,6 +137,8 @@ function buildReport(state: State, date: Date): Report {
     filmFt2: t.filmFt2,
     pricePerFt2: t.pricePerFt2,
     quote: t.quote,
+    transport: t.transport,
+    total: t.total,
   };
 }
 
@@ -175,6 +203,32 @@ export function reducer(state: State, action: Action): State {
       return invalidate({ ...state, margin: clampMargin(action.value) });
     case "price":
       return invalidate({ ...state, priceInput: action.value });
+    case "transportOn":
+      return invalidate({ ...state, transportOn: action.value });
+    case "province":
+      return invalidate({ ...state, province: action.value });
+    case "transport":
+      return invalidate({ ...state, transportInput: action.value });
+    case "prefill": {
+      // Ficha de un cliente (WhatsApp) arrastrada a la calculadora: cliente y
+      // superficies con unidad se agregan solas; la primera sin unidad queda
+      // en el formulario para completarla. Precio y transporte son manuales.
+      let next: State = { ...state, client: action.client || state.client, province: action.province ?? state.province };
+      const pendientes: SuperficieLeida[] = [];
+      for (const s of action.surfaces) {
+        if (!s.unit) {
+          pendientes.push(s);
+          continue;
+        }
+        next = reducer(
+          { ...next, description: s.description, shape: s.shape, unit: s.unit, dimInputs: s.dims, dimErrors: {} },
+          { type: "add" },
+        );
+      }
+      const p = pendientes[0];
+      if (p) next = { ...next, description: p.description, shape: p.shape, dimInputs: p.dims, dimErrors: {} };
+      return invalidate(next);
+    }
     case "generate": {
       if (state.items.length === 0) return state;
       return { ...state, reportStale: false, report: buildReport(state, action.date) };
