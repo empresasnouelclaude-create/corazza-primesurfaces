@@ -32,7 +32,7 @@ export const NOTA_PRIMER_MENSAJE =
 
 /** Respuesta cuando un cliente llama por WhatsApp. Texto pedido por los dueños. */
 export const MENSAJE_LLAMADA =
-  "En estos momentos no podemos atender llamada, podemos coordinarla con el departamento de ventas para hacerla más adelante.😊";
+  "En estos momentos no podemos atender llamada, podemos coordinarla con servicio al cliente para hacerla más adelante.😊";
 
 /**
  * Nota que se agrega al mensaje del cliente cuando el caso ya se paso a
