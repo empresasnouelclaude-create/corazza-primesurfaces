@@ -29,6 +29,8 @@ export type Item = {
 export type Report = {
   date: Date;
   client: string;
+  /** Codigo del cliente (0007) si vino de una ficha de WhatsApp. */
+  code: string | null;
   items: Item[];
   totalFt2: number;
   margin: number;
@@ -43,6 +45,7 @@ export type Report = {
 
 export type State = {
   client: string;
+  code: string | null;
   description: string;
   shape: Shape;
   unit: Unit;
@@ -76,11 +79,12 @@ export type Action =
   | { type: "province"; value: string }
   | { type: "transport"; value: string }
   | { type: "generate"; date: Date }
-  | { type: "prefill"; client: string; surfaces: SuperficieLeida[]; province: string | null };
+  | { type: "prefill"; client: string; code: string | null; surfaces: SuperficieLeida[]; province: string | null };
 
 export function initialState(): State {
   return {
     client: "",
+    code: null,
     description: "",
     shape: DEFAULT_SHAPE,
     unit: DEFAULT_UNIT,
@@ -131,6 +135,7 @@ function buildReport(state: State, date: Date): Report {
   return {
     date,
     client: state.client.trim(),
+    code: state.code,
     items: state.items,
     totalFt2: t.totalFt2,
     margin: state.margin,
@@ -213,7 +218,7 @@ export function reducer(state: State, action: Action): State {
       // Ficha de un cliente (WhatsApp) arrastrada a la calculadora: cliente y
       // superficies con unidad se agregan solas; la primera sin unidad queda
       // en el formulario para completarla. Precio y transporte son manuales.
-      let next: State = { ...state, client: action.client || state.client, province: action.province ?? state.province };
+      let next: State = { ...state, client: action.client || state.client, code: action.code, province: action.province ?? state.province };
       const pendientes: SuperficieLeida[] = [];
       for (const s of action.surfaces) {
         if (!s.unit) {

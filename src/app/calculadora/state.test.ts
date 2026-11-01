@@ -156,10 +156,12 @@ test("ficha de WhatsApp: llena cliente y superficies; precio y transporte quedan
   s = reducer(s, {
     type: "prefill",
     client: "Laura",
+    code: "0007",
     surfaces: leerSuperficies("comedor 72 x 40 in; centro 48 x 24 in", "mesas"),
     province: "Santiago",
   });
   assert.equal(s.client, "Laura");
+  assert.equal(s.code, "0007");
   assert.deepEqual(s.items.map((i) => [i.description, i.unit, i.shape]), [
     ["comedor", "in", "rectangular"],
     ["centro", "in", "rectangular"],
@@ -168,7 +170,7 @@ test("ficha de WhatsApp: llena cliente y superficies; precio y transporte quedan
   assert.equal(s.transportOn, false);
   assert.equal(s.province, "Santiago");
   // Sin unidad: queda en el formulario para completarla.
-  s = reducer(initialState(), { type: "prefill", client: "Ana", surfaces: leerSuperficies("60 x 30", "mesa de centro"), province: null });
+  s = reducer(initialState(), { type: "prefill", client: "Ana", code: null, surfaces: leerSuperficies("60 x 30", "mesa de centro"), province: null });
   assert.equal(s.items.length, 0);
   assert.deepEqual(s.dimInputs, { largo: "60", ancho: "30" });
   assert.equal(s.description, "mesa de centro");
