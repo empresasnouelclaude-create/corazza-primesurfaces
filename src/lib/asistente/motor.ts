@@ -5,7 +5,7 @@
 // sirve igual para el webhook de WhatsApp y para el simulador.
 import type Anthropic from "@anthropic-ai/sdk";
 import { HERRAMIENTAS, ejecutarHerramienta } from "./herramientas.ts";
-import { MENSAJE_BIENVENIDA, instruccionesAsistente } from "./prompt.ts";
+import { MENSAJE_BIENVENIDA, NOTA_PRIMER_MENSAJE, instruccionesAsistente } from "./prompt.ts";
 import type { Accion, Conversacion, Entrada } from "./tipos.ts";
 
 export type ParametrosIA = Anthropic.Beta.Messages.MessageCreateParamsNonStreaming;
@@ -99,14 +99,19 @@ export async function responder({
   const acciones: Accion[] = [];
 
   const esNueva = conversacion.mensajes.length === 0;
+  const soloSaludo = esSoloSaludo(entrada);
   // El historial se guarda siempre, aunque la conversacion la lleve un vendedor.
-  conv.mensajes.push({ role: "user", content: contenidoCliente(entrada) });
+  const contenido = contenidoCliente(entrada);
+  if (esNueva && !soloSaludo) contenido.push({ type: "text", text: NOTA_PRIMER_MENSAJE });
+  conv.mensajes.push({ role: "user", content: contenido });
   if (!conv.datos.nombre && entrada.nombrePerfil) conv.datos = { ...conv.datos, nombre: entrada.nombrePerfil };
   if (conv.estado === "vendedor") return { conversacion: conv, respuestas, acciones };
-  // Bienvenida fija al empezar una conversacion (la IA sigue con la primera pregunta).
-  if (esNueva) {
+  // Si el primer mensaje es solo un saludo, va la bienvenida fija y nada mas.
+  // Si trae una pregunta, la IA saluda, responde y hace las preguntas (ver
+  // PRIMER MENSAJE CON PREGUNTA en prompt.ts).
+  if (esNueva && soloSaludo) {
     respuestas.push(MENSAJE_BIENVENIDA);
-    if (esSoloSaludo(entrada)) return { conversacion: conv, respuestas, acciones };
+    return { conversacion: conv, respuestas, acciones };
   }
 
   for (let vuelta = 0; vuelta < MAX_VUELTAS; vuelta++) {
