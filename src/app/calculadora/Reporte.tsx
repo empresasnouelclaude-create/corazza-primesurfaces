@@ -94,13 +94,30 @@ export default function Reporte({ report }: { report: Report }) {
           {/* Para el cliente: area total y monto. El margen, el film y el
               precio por ft² son internos y no se muestran (el monto se
               calcula sobre el film, ver formulas.ts). */}
-          {report.quote !== null && (
+          {report.quote !== null && report.transport && (
+            <>
+              <div className="flex justify-between gap-4 py-2.5">
+                <dt>{TEXT.protection}</dt>
+                <dd className="tabular-nums">{formatRD(report.quote)}</dd>
+              </div>
+              <div className="flex justify-between gap-4 py-2.5">
+                <dt>
+                  {TEXT.transport}
+                  {report.transport.province && <span className="text-corazza-taupe"> · {report.transport.province}</span>}
+                </dt>
+                <dd className="tabular-nums">{formatRD(report.transport.amount)}</dd>
+              </div>
+            </>
+          )}
+          {report.total !== null && (
             <div className="flex items-baseline justify-between gap-4 py-3">
-              <dt className="font-semibold">{TEXT.quote}</dt>
-              <dd className="font-corazza-serif text-2xl font-medium tabular-nums [font-variant-numeric:lining-nums_tabular-nums]">{formatRD(report.quote)}</dd>
+              <dt className="font-semibold">{report.transport ? TEXT.total : TEXT.quote}</dt>
+              <dd className="font-corazza-serif text-2xl font-medium tabular-nums [font-variant-numeric:lining-nums_tabular-nums]">{formatRD(report.total)}</dd>
             </div>
           )}
         </dl>
+
+        {report.total !== null && <p className="mt-6 font-corazza-sans text-xs leading-relaxed text-corazza-charcoal/80">{TEXT.validity}</p>}
       </div>
     </article>
   );

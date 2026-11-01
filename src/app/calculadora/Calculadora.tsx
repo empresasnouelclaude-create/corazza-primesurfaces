@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useId, useReducer, useRef, useState } from "react";
-import { DIMENSION_LABELS, ERRORS, PRICE_ERRORS, SHAPES, TEXT, UNITS } from "./config.ts";
+import { DIMENSION_LABELS, ERRORS, PRICE_ERRORS, PROVINCIAS, SHAPES, TEXT, UNITS } from "./config.ts";
 import { MARGIN_MAX, MARGIN_MIN, SHAPE_DIMENSIONS, format2, formatRD, ft2ToM2, parsePositive } from "./formulas.ts";
 import Reporte, { itemMeasures, shapeLabel } from "./Reporte";
 import { initialState, reducer, totals } from "./state.ts";
@@ -73,6 +73,8 @@ export default function Calculadora() {
   const unitShort = UNITS.find((u) => u.id === state.unit)?.short ?? state.unit;
   const priceParsed = parsePositive(state.priceInput);
   const priceError = state.priceInput.trim() !== "" && !priceParsed.ok ? PRICE_ERRORS[priceParsed.error] : undefined;
+  const transportParsed = parsePositive(state.transportInput);
+  const transportError = state.transportInput.trim() !== "" && !transportParsed.ok ? PRICE_ERRORS[transportParsed.error] : undefined;
   const reportId = state.report?.date.getTime();
 
   // Al generar el reporte, llevar la vista (y el foco) hasta el.
@@ -335,6 +337,73 @@ export default function Calculadora() {
                   <div className="mt-4 flex items-baseline justify-between gap-3">
                     <p className="font-corazza-sans text-sm">{TEXT.quote}</p>
                     <p className="font-corazza-serif text-3xl font-medium tabular-nums [font-variant-numeric:lining-nums_tabular-nums]">{formatRD(t.quote)}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Transporte (opcional): se suma a la cotizacion. */}
+              <div className="mt-5 border-t border-corazza-white/15 pt-5">
+                {!state.transportOn ? (
+                  <button
+                    type="button"
+                    onClick={() => dispatch({ type: "transportOn", value: true })}
+                    className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-corazza-white/40 px-5 font-corazza-sans text-sm font-semibold text-corazza-white hover:bg-corazza-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corazza-beige"
+                  >
+                    + {TEXT.transportAdd}
+                  </button>
+                ) : (
+                  <fieldset>
+                    <div className="flex items-baseline justify-between gap-3">
+                      <legend className="font-corazza-sans text-sm font-semibold">{TEXT.transportSection}</legend>
+                      <button
+                        type="button"
+                        onClick={() => dispatch({ type: "transportOn", value: false })}
+                        className="font-corazza-sans text-xs text-corazza-cream underline underline-offset-2 hover:text-corazza-white"
+                      >
+                        {TEXT.transportRemove}
+                      </button>
+                    </div>
+                    <label htmlFor={`${uid}-province`} className="mt-3 block font-corazza-sans text-[13px] text-corazza-cream">
+                      {TEXT.transportProvince}
+                    </label>
+                    <select
+                      id={`${uid}-province`}
+                      value={state.province}
+                      onChange={(e) => dispatch({ type: "province", value: e.target.value })}
+                      className="mt-1 h-12 w-full rounded-xl border border-corazza-white/40 bg-corazza-white/10 px-4 font-corazza-sans text-base text-corazza-white focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corazza-beige [&>option]:text-corazza-charcoal"
+                    >
+                      <option value="">{TEXT.transportProvincePlaceholder}</option>
+                      {PROVINCIAS.map((p) => (
+                        <option key={p} value={p}>
+                          {p}
+                        </option>
+                      ))}
+                    </select>
+                    <label htmlFor={`${uid}-transport`} className="mt-3 block font-corazza-sans text-[13px] text-corazza-cream">
+                      {TEXT.transportAmount}
+                    </label>
+                    <input
+                      id={`${uid}-transport`}
+                      type="text"
+                      inputMode="decimal"
+                      autoComplete="off"
+                      value={state.transportInput}
+                      onChange={(e) => dispatch({ type: "transport", value: e.target.value })}
+                      aria-invalid={transportError ? true : undefined}
+                      aria-describedby={transportError ? `${uid}-transport-error` : undefined}
+                      className="mt-1 h-12 w-full tabular-nums placeholder:text-corazza-cream/80 rounded-xl border border-corazza-white/40 bg-corazza-white/10 px-4 font-corazza-sans text-base text-corazza-white focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corazza-beige"
+                    />
+                    {transportError && (
+                      <p id={`${uid}-transport-error`} className="mt-1.5 font-corazza-sans text-[13px] text-corazza-cream">
+                        {transportError}
+                      </p>
+                    )}
+                  </fieldset>
+                )}
+                {t.total !== null && t.transport && (
+                  <div className="mt-4 flex items-baseline justify-between gap-3">
+                    <p className="font-corazza-sans text-sm font-semibold">{TEXT.total}</p>
+                    <p className="font-corazza-serif text-3xl font-medium tabular-nums [font-variant-numeric:lining-nums_tabular-nums]">{formatRD(t.total)}</p>
                   </div>
                 )}
               </div>

@@ -11,6 +11,42 @@
 
 import type { Dimension, NumberError, Shape, Unit } from "./formulas";
 
+/** Provincias de Republica Dominicana (31 y el Distrito Nacional), para el transporte. */
+export const PROVINCIAS = [
+  "Azua",
+  "Bahoruco",
+  "Barahona",
+  "Dajabón",
+  "Distrito Nacional",
+  "Duarte",
+  "El Seibo",
+  "Elías Piña",
+  "Espaillat",
+  "Hato Mayor",
+  "Hermanas Mirabal",
+  "Independencia",
+  "La Altagracia",
+  "La Romana",
+  "La Vega",
+  "María Trinidad Sánchez",
+  "Monseñor Nouel",
+  "Monte Cristi",
+  "Monte Plata",
+  "Pedernales",
+  "Peravia",
+  "Puerto Plata",
+  "Samaná",
+  "San Cristóbal",
+  "San José de Ocoa",
+  "San Juan",
+  "San Pedro de Macorís",
+  "Sánchez Ramírez",
+  "Santiago",
+  "Santiago Rodríguez",
+  "Santo Domingo",
+  "Valverde",
+] as const;
+
 // Orden exigido por la especificacion: Circular, Rectangular, Cuadrada.
 export const SHAPES: { id: Shape; label: string }[] = [
   { id: "circular", label: "Circular" },
@@ -82,6 +118,16 @@ export const TEXT = {
     "El film recomendado es una estimación por área: no garantiza el aprovechamiento de los rollos, la orientación de los cortes ni los anchos disponibles.",
   quoteNote:
     "La cotización se calcula sobre el film recomendado (área total + margen). En el reporte del cliente solo aparecen el área total y el monto, sin el margen.",
+  transportSection: "Transporte",
+  transportAdd: "Agregar transporte",
+  transportRemove: "Quitar transporte",
+  transportProvince: "Provincia",
+  transportProvincePlaceholder: "Elige la provincia",
+  transportAmount: "Monto del transporte (RD$)",
+  protection: "Protección",
+  transport: "Transporte",
+  total: "Total",
+  validity: "Cotización válida por 15 días.",
   generate: "Generar reporte",
   generateDisabled: "Agrega al menos una superficie para generar el reporte.",
   reportTitle: "Reporte de medidas",
