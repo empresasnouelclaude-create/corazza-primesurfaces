@@ -73,7 +73,7 @@ test("motor: ejecuta herramientas, devuelve el texto y conserva el historial", a
     crear,
     ahora: AHORA,
   });
-  assert.deepEqual(r.respuestas, [MENSAJE_BIENVENIDA, "¡Qué bien! ¿Me compartes las medidas aproximadas?"]);
+  assert.deepEqual(r.respuestas, ["¡Qué bien! ¿Me compartes las medidas aproximadas?"]);
   assert.equal(r.conversacion.datos.superficie, "mesa de comedor");
   assert.equal(r.conversacion.datos.nombre, "Patricia");
   // usuario, asistente (herramienta), resultado, asistente (texto)
@@ -102,7 +102,7 @@ test("motor: con la conversacion en manos del vendedor, guarda el mensaje pero n
 test("motor: si la IA declina, pasa al vendedor con un mensaje amable", async () => {
   const { crear } = iaFalsa([{ stop_reason: "refusal", content: [] }]);
   const r = await responder({ conversacion: nuevaConversacion("1"), entrada: { texto: "..." }, crear, ahora: AHORA });
-  assert.deepEqual(r.respuestas, [MENSAJE_BIENVENIDA, MENSAJE_PASE]);
+  assert.deepEqual(r.respuestas, [MENSAJE_PASE]);
   assert.equal(r.conversacion.estado, "vendedor");
 });
 
@@ -112,7 +112,7 @@ test("motor: las fotos pedidas salen como accion", async () => {
     { stop_reason: "end_turn", content: [texto("¿Qué te parece?")] },
   ]);
   const r = await responder({ conversacion: nuevaConversacion("1"), entrada: { texto: "¿Cómo se ve?" }, crear });
-  assert.deepEqual(r.respuestas, [MENSAJE_BIENVENIDA, "Te comparto cómo se ve:", "¿Qué te parece?"]);
+  assert.deepEqual(r.respuestas, ["Te comparto cómo se ve:", "¿Qué te parece?"]);
   const fotos = r.acciones.find((a) => a.tipo === "enviar_fotos");
   assert.ok(fotos && fotos.tipo === "enviar_fotos" && fotos.fotos[0].url.endsWith(".jpg"));
 });
@@ -186,4 +186,15 @@ test("solo saludo: reconoce saludos y palabras clave, no preguntas reales", asyn
   for (const t of ["¿Cómo se ve?", "Hola, tengo una mesa de mármol", "Mi nombre es Ana", "...", ""]) {
     assert.equal(esSoloSaludo({ texto: t }), false, t);
   }
+});
+
+test("motor: si el primer mensaje trae una pregunta, no va la bienvenida fija y la IA recibe la nota", async () => {
+  const { responder } = await import("./motor.ts");
+  const { nuevaConversacion } = await import("./tipos.ts");
+  const { NOTA_PRIMER_MENSAJE } = await import("./prompt.ts");
+  const { crear, llamadas } = iaFalsa([{ stop_reason: "end_turn", content: [{ type: "text", text: "Hola, soy el asistente…", citations: null }] }]);
+  const r = await responder({ conversacion: nuevaConversacion("1"), entrada: { texto: "Quiero saber cómo funciona" }, crear });
+  assert.deepEqual(r.respuestas, ["Hola, soy el asistente…"]);
+  assert.match(JSON.stringify(llamadas[0].messages[0].content), /Nota del sistema/);
+  assert.ok(JSON.stringify(llamadas[0].messages).includes(NOTA_PRIMER_MENSAJE.slice(0, 20)));
 });
