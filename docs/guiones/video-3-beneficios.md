@@ -11,3 +11,6 @@ Antes de grabar: mostrar en cámara solo lo que se haya probado (rayado, manchas
 
 ## Idea para el final
 Al terminar, a Katherine se le cae algo sobre la mesa (por ejemplo, una taza o un vaso), dice *"¡Ay!"* y comienza a limpiar con el kit de cuidado (atomizador y toalla de microfibra). La mesa queda perfecta: cierra mostrando el beneficio del mantenimiento simple y del kit.
+
+## Formato del video
+Katherine realiza diferentes acciones sobre la mesa ya protegida mientras se intercalan imágenes del proceso, los materiales, etc. Video dinámico, con muchos cortes y buen humor. Termina con la escena de "¡Ay!" y la limpieza con el kit.
