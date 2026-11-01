@@ -21,4 +21,5 @@ test("varias superficies de la ficha, con descripcion y unidad compartida", () =
   ]);
   assert.equal(leerSuperficies("60 x 30 cm", "mesa de centro")[0].description, "mesa de centro");
   assert.deepEqual(leerSuperficies(null, "x"), []);
+  assert.equal(leerSuperficies("redonda de 120 cm de diámetro", "mesa de comedor redonda")[0].description, "mesa de comedor redonda");
 });

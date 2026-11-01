@@ -48,7 +48,13 @@ export function leerSuperficies(medidas: string | null | undefined, superficie: 
   const leidas = partes.map((parte) => {
     const m = leerMedidas(parte);
     if (!m) return null;
-    const etiqueta = parte.split(/\d/)[0].replace(/[:\-–]/g, " ").trim();
+    // Palabras que describen la medida, no la superficie ("redonda de", "mide").
+    const etiqueta = parte
+      .split(/\d/)[0]
+      .replace(/[:\-–]/g, " ")
+      .replace(/\b(redond[ao]s?|circular|di[aá]metro|de|del|mide|miden|medidas?|aprox(imadamente)?|unos?|como|es|son)\b/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim();
     return { ...m, description: etiqueta || (superficie ?? "").trim() };
   });
   const unidadComun = leidas.find((l) => l?.unit)?.unit ?? null;

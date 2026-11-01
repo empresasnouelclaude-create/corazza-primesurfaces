@@ -23,17 +23,50 @@ export type DatosFicha = { client: string; surfaces: SuperficieLeida[]; province
 
 export const TIPO_ARRASTRE = "application/x-corazza-ficha";
 
-/** Ficha de ejemplo para probar mientras no hay clientes reales. */
-export const FICHA_EJEMPLO: Ficha = {
-  telefono: "18095550142",
-  nombre: "Laura Méndez (ejemplo)",
-  superficie: "mesa de comedor y mesa de centro",
-  material: "mármol",
-  medidas: "comedor 72 x 40 in; centro 48 x 24 in",
-  sector: "Santiago, Los Jardines",
-  actualizado: new Date().toISOString(),
-  ejemplo: true,
-};
+/** Fichas de ejemplo para probar (casos distintos de medidas). */
+const ahora = new Date().toISOString();
+export const FICHAS_EJEMPLO: Ficha[] = [
+  {
+    telefono: "18095550142",
+    nombre: "Laura Méndez (ejemplo)",
+    superficie: "mesa de comedor y mesa de centro",
+    material: "mármol",
+    medidas: "comedor 72 x 40 in; centro 48 x 24 in",
+    sector: "Santiago, Los Jardines",
+    actualizado: ahora,
+    ejemplo: true,
+  },
+  {
+    telefono: "18295550199",
+    nombre: "Carlos Peña (ejemplo)",
+    superficie: "mesa de comedor redonda",
+    material: "granito",
+    medidas: "redonda de 120 cm de diámetro",
+    sector: "Santo Domingo, Piantini",
+    actualizado: ahora,
+    ejemplo: true,
+  },
+  {
+    telefono: "18495550123",
+    nombre: "María Rosario (ejemplo)",
+    superficie: "recibidor",
+    material: "cuarzo",
+    medidas: "1.20 x 0.40 m",
+    sector: "Punta Cana, La Altagracia",
+    actualizado: ahora,
+    ejemplo: true,
+  },
+  {
+    telefono: "18095550177",
+    nombre: "José Almonte (ejemplo)",
+    superficie: "mesa de centro",
+    material: "travertino",
+    medidas: "60 x 30",
+    sector: "La Romana",
+    actualizado: ahora,
+    ejemplo: true,
+  },
+];
 
 /** Provincia que aparece en el texto de ciudad y sector (la mas larga que coincida). */
 export function provinciaDe(sector: string | null): string | null {
@@ -92,7 +125,7 @@ export default function FichasClientes({ onUsar }: { onUsar: (f: Ficha) => void 
     return () => clearInterval(id);
   }, []);
 
-  const lista = [...(fichas ?? []), FICHA_EJEMPLO];
+  const lista = [...(fichas ?? []), ...FICHAS_EJEMPLO];
 
   return (
     <section aria-labelledby="fichas-titulo" className="rounded-2xl border border-corazza-charcoal/15 bg-corazza-white p-5 sm:p-6">
