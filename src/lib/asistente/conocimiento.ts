@@ -22,6 +22,12 @@ export const SITIO = "https://www.corazza.com.do";
 /** Enlace a la guia "¿Cómo medir mi tope?" de la web. */
 export const GUIA_MEDICION_URL = `${SITIO}/#como-medir`;
 
+/** Imagen de la guia de medicion (la misma de la web), para enviarla por WhatsApp. */
+export const FOTO_GUIA_MEDICION = {
+  url: `${SITIO}/guia-medicion.jpg`,
+  pie: "Así se mide: largo y ancho, o el diámetro si es redonda. Con medidas aproximadas es suficiente 😊",
+} as const;
+
 // Imagenes que el asistente puede enviar (URLs publicas de la web). WhatsApp
 // solo acepta JPG o PNG como imagen, por eso no se usan las .webp.
 // Son imagenes de referencia de la marca, no instalaciones de clientes: los
@@ -72,7 +78,7 @@ DESPUÉS DE LA INSTALACIÓN
 Cada cliente recibe el kit de cuidado: ${EXPERIENCIA.items.join(", ").toLowerCase()}. La tarjeta QR sirve para registrar la garantía.
 
 CÓMO MEDIR
-La web tiene una guía con dibujos para medir superficies rectangulares (largo y ancho) y redondas (diámetro): ${GUIA_MEDICION_URL}
+Hay una guía en imagen para medir superficies rectangulares (largo y ancho) y redondas (diámetro). Se envía con enviar_guia_medicion si el cliente la quiere; no se comparte ningún enlace.
 Para cotizar basta con medidas aproximadas; si hace falta, el equipo hace una visita de medición.
 
 CÓMO SE TRABAJA (decisiones de la reunión de experiencia del cliente)

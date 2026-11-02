@@ -3,7 +3,7 @@
 // La ejecucion es pura: devuelve la conversacion actualizada, el resultado
 // para la IA y las acciones externas (enviar fotos, avisar al vendedor).
 import type Anthropic from "@anthropic-ai/sdk";
-import { FOTOS_TRABAJOS, GUIA_MEDICION_URL, type TipoFotos } from "./conocimiento.ts";
+import { FOTOS_TRABAJOS, FOTO_GUIA_MEDICION, type TipoFotos } from "./conocimiento.ts";
 import type { Accion, Conversacion, DatosCliente, MotivoPase } from "./tipos.ts";
 
 const texto = { type: ["string", "null"] as const };
@@ -31,7 +31,8 @@ export const HERRAMIENTAS: Anthropic.Beta.BetaTool[] = [
   },
   {
     name: "enviar_guia_medicion",
-    description: "Devuelve el enlace a la guía de la web para medir mesas y superficies. Úsala solo si el enlace todavía no está en la conversación.",
+    description:
+      "Envía al cliente una imagen con la guía de cómo medir (largo y ancho, o diámetro). Úsala solo cuando el cliente dijo que sí quiere la guía.",
     strict: true,
     input_schema: { type: "object", properties: {}, required: [], additionalProperties: false },
   },
@@ -96,7 +97,11 @@ export function ejecutarHerramienta(
       };
     }
     case "enviar_guia_medicion":
-      return { conversacion, resultado: JSON.stringify({ enlace: GUIA_MEDICION_URL }), acciones: [] };
+      return {
+        conversacion,
+        resultado: JSON.stringify({ enviada: true, nota: "La imagen con la guía se envía después de tu mensaje. No compartas ningún enlace." }),
+        acciones: [{ tipo: "enviar_fotos", fotos: [FOTO_GUIA_MEDICION] }],
+      };
     case "enviar_fotos_trabajos": {
       const tipo = args.tipo as TipoFotos;
       const fotos = FOTOS_TRABAJOS[tipo];
