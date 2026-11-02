@@ -78,7 +78,7 @@ DESPUÉS DE LA INSTALACIÓN
 Cada cliente recibe el kit de cuidado: ${EXPERIENCIA.items.join(", ").toLowerCase()}. La tarjeta QR sirve para registrar la garantía.
 
 CÓMO MEDIR
-La web tiene una guía con dibujos para medir superficies rectangulares (largo y ancho) y redondas (diámetro): ${GUIA_MEDICION_URL}
+Hay una guía en imagen para medir superficies rectangulares (largo y ancho) y redondas (diámetro). Se envía con enviar_guia_medicion si el cliente la quiere; no se comparte ningún enlace.
 Para cotizar basta con medidas aproximadas; si hace falta, el equipo hace una visita de medición.
 
 CÓMO SE TRABAJA (decisiones de la reunión de experiencia del cliente)
