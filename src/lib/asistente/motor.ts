@@ -5,6 +5,7 @@
 // sirve igual para el webhook de WhatsApp y para el simulador.
 import type Anthropic from "@anthropic-ai/sdk";
 import { HERRAMIENTAS, ejecutarHerramienta } from "./herramientas.ts";
+import { FOTO_GUIA_MEDICION } from "./conocimiento.ts";
 import { MENSAJE_BIENVENIDA, NOTA_CASO_EN_VENTAS, NOTA_PRIMER_MENSAJE, instruccionesAsistente } from "./prompt.ts";
 import type { Accion, Conversacion, Entrada } from "./tipos.ts";
 
@@ -117,6 +118,8 @@ export async function responder({
   // PRIMER MENSAJE CON PREGUNTA en prompt.ts).
   if (esNueva && soloSaludo) {
     respuestas.push(MENSAJE_BIENVENIDA);
+    // La bienvenida pide las medidas: va con la imagen de como medir.
+    acciones.push({ tipo: "enviar_fotos", fotos: [FOTO_GUIA_MEDICION] });
     return { conversacion: conv, respuestas, acciones };
   }
 

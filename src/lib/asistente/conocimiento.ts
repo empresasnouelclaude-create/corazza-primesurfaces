@@ -22,6 +22,12 @@ export const SITIO = "https://www.corazza.com.do";
 /** Enlace a la guia "¿Cómo medir mi tope?" de la web. */
 export const GUIA_MEDICION_URL = `${SITIO}/#como-medir`;
 
+/** Imagen de la guia de medicion (la misma de la web), para enviarla por WhatsApp. */
+export const FOTO_GUIA_MEDICION = {
+  url: `${SITIO}/guia-medicion.jpg`,
+  pie: "Así se mide: largo y ancho, o el diámetro si es redonda. Con medidas aproximadas es suficiente 😊",
+} as const;
+
 // Imagenes que el asistente puede enviar (URLs publicas de la web). WhatsApp
 // solo acepta JPG o PNG como imagen, por eso no se usan las .webp.
 // Son imagenes de referencia de la marca, no instalaciones de clientes: los

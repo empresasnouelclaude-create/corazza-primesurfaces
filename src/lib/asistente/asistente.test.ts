@@ -6,6 +6,7 @@ import { createHmac } from "node:crypto";
 import type Anthropic from "@anthropic-ai/sdk";
 import { HERRAMIENTAS, ejecutarHerramienta } from "./herramientas.ts";
 import { MENSAJE_BIENVENIDA } from "./prompt.ts";
+import { FOTO_GUIA_MEDICION } from "./conocimiento.ts";
 import { MENSAJE_PASE, parametrosIA, responder, type CrearMensaje, type ParametrosIA } from "./motor.ts";
 import { instruccionesAsistente } from "./prompt.ts";
 import { nuevaConversacion } from "./tipos.ts";
@@ -182,6 +183,7 @@ test("motor: la bienvenida fija sale solo en el primer mensaje", async () => {
   const { crear, llamadas } = iaFalsa([texto("¿Me envías una foto?")]);
   const r1 = await responder({ conversacion: nuevaConversacion("1809"), entrada: { texto: "Hola" }, crear });
   assert.deepEqual(r1.respuestas, [MENSAJE_BIENVENIDA], "si solo saluda, basta con la bienvenida");
+  assert.deepEqual(r1.acciones, [{ tipo: "enviar_fotos", fotos: [FOTO_GUIA_MEDICION] }], "con la imagen de cómo medir");
   assert.equal(llamadas.length, 0);
   const r2 = await responder({ conversacion: r1.conversacion, entrada: { texto: "Mi mesa de comedor" }, crear });
   assert.deepEqual(r2.respuestas, ["¿Me envías una foto?"]);
